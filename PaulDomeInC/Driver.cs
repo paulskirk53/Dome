@@ -600,10 +600,11 @@ namespace ASCOM.GowerCDome
             double.TryParse(response, out CurrentAzimuth);
             if (Math.Abs(CurrentAzimuth - Azimuth) > 5.0)       // if the difference between current az and target az is >5 degrees in R.A. do some movement
             {
-                if (Azimuth < CurrentAzimuth)  //Counterclockwise movement required - check this empirically as motor direction may be incorrect
+                if (Azimuth < CurrentAzimuth)                   // Counterclockwise movement required - check this empirically as motor direction may be incorrect
                 {
                     pkstepper.ClearBuffers();
-                    pkstepper.Transmit("CC#");
+                    //pkstepper.Transmit("CC#");                   removed the current CC# line here and take the opportunity to replace it as below sending the current az as well
+                    pkstepper.Transmit("CC" + CurrentAzimuth.ToString("0.##") + "#");
 
                     pkstepper.Transmit("SA" + Azimuth.ToString("0.##") + "#");
                 }
@@ -611,7 +612,8 @@ namespace ASCOM.GowerCDome
                 if (Azimuth > CurrentAzimuth)  //clockwise movement required - check this empirically as motor direction may be incorrect
                 {
                     pkstepper.ClearBuffers();
-                    pkstepper.Transmit("CL#");
+                   // pkstepper.Transmit("CL#");                   remove the current CL# line here and take the opportunity to replace it as below sending the current az as well
+                    pkstepper.Transmit("CL" + CurrentAzimuth.ToString("0.##") + "#");
 
                     pkstepper.Transmit("SA" + Azimuth.ToString("0.##") + "#");
                     // pkstepper.Transmit(Azimuth.ToString("0.##") + "#");  
