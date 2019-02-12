@@ -590,6 +590,7 @@ namespace ASCOM.GowerCDome
             // and comparing it to the target azimuth, then commands the slew and the direction
 
             // get current Az
+            int DiffMod;
             double CurrentAzimuth = 0.0;
             pkcompass.ClearBuffers();
             pkcompass.Transmit("AZ#");
@@ -600,6 +601,28 @@ namespace ASCOM.GowerCDome
             double.TryParse(response, out CurrentAzimuth);
             if (Math.Abs(CurrentAzimuth - Azimuth) > 5.0)       // if the difference between current az and target az is >5 degrees in R.A. do some movement
             {
+                // new code below optimises movement to take the shortest distance
+                DiffMod = (int)(Azimuth - CurrentAzimuth) % 360;
+                if (DiffMod >= 180)
+                {
+                    pkstepper.ClearBuffers();
+                    pkstepper.Transmit("CL" + CurrentAzimuth.ToString("0.##") + "#");
+                    pkstepper.Transmit("SA" + Azimuth.ToString("0.##") + "#");
+                }
+
+                else   // the less than 180 scenario
+
+                {
+                    pkstepper.ClearBuffers();
+                    pkstepper.Transmit("CC" + CurrentAzimuth.ToString("0.##") + "#");
+                    pkstepper.Transmit("SA" + Azimuth.ToString("0.##") + "#");
+                }
+
+                //end new code 12-2-19
+                
+                
+                /* the old move to azimuth code commented out below 
+                 * 
                 if (Azimuth < CurrentAzimuth)                   // Counterclockwise movement required - check this empirically as motor direction may be incorrect
                 {
                     pkstepper.ClearBuffers();
@@ -618,6 +641,9 @@ namespace ASCOM.GowerCDome
                     pkstepper.Transmit("SA" + Azimuth.ToString("0.##") + "#");
                     // pkstepper.Transmit(Azimuth.ToString("0.##") + "#");  
                 }
+
+                */
+
             }
         }
 
