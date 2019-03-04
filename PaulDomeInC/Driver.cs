@@ -508,6 +508,8 @@ namespace ASCOM.GowerCDome
 
         public void Park()
         {
+            //4-3-19 the code below is insufficient - the stepper needs CLcurrentaz# followed by SAParkAzimuth# and Sl comands in order to slowdown/ stop
+            // the CL and Sa are in our control but will need to check is SL is issued by the driver for park slews
             //slew (SA.....#) to park position
             pkstepper.ClearBuffers();
             pkstepper.Transmit("SA" + ParkAzimuth.ToString("0.##") + "#");
@@ -519,7 +521,7 @@ namespace ASCOM.GowerCDome
         {
             //mycode
             //get the current azimuth 1st
-            ParkAzimuth = 180.0;                        // south by default
+            ParkAzimuth = 90.0;                        // shutter faces into woodland on park
             pkcompass.ClearBuffers();
             pkcompass.Transmit("AZ#");
 
@@ -529,7 +531,7 @@ namespace ASCOM.GowerCDome
             if (double.TryParse(response, out az))
                  ParkAzimuth = az;
             else
-                ParkAzimuth = 45;                            // north east by default
+                ParkAzimuth = 90;                            // north east by default
 
        
             //endmycode
