@@ -246,7 +246,7 @@ namespace ASCOM.GowerCDome
                     pkstepper.RTSEnable = false;
                     pkstepper.ReceiveTimeout = 10000;
 
-                    pkstepper.Speed = SerialSpeed.ps57600;
+                    pkstepper.Speed = SerialSpeed.ps115200;            // was SerialSpeed.ps57600;
                     pkstepper.Connected = true;
                     pkstepper.ClearBuffers();
 
@@ -259,7 +259,7 @@ namespace ASCOM.GowerCDome
                     pkcompass.RTSEnable = false;
                     pkcompass.ReceiveTimeout = 10000;
 
-                    pkcompass.Speed = SerialSpeed.ps57600;   // todo check with arduino board
+                    pkcompass.Speed = SerialSpeed.ps115200; // was ps57600;   // todo check with arduino board
                     pkcompass.Connected = true;
                     pkcompass.ClearBuffers();
 
@@ -374,7 +374,7 @@ namespace ASCOM.GowerCDome
                 AP_response = AP_response.Replace("#", "");                // AP_Response will contain the dome azimuth from the compass.
                double az = 0.0;
                double.TryParse(AP_response, out az);
-                if (Math.Abs(az - ParkAzimuth) < 0.5)                      // does this work correctly on double DT?
+                if (Math.Abs(az - ParkAzimuth) <= 10.0)                      // does this work correctly on double DT?
                     return true;
                 else
                     return false;
@@ -508,13 +508,52 @@ namespace ASCOM.GowerCDome
 
         public void Park()
         {
-            //4-3-19 the code below is insufficient - the stepper needs CLcurrentaz# followed by SAParkAzimuth# and Sl comands in order to slowdown/ stop
+            //4-3-19 the old code below is insufficient - the stepper needs CLcurrentaz# followed by SAParkAzimuth# and Sl comands in order to slowdown/ stop
             // the CL and Sa are in our control but will need to check is SL is issued by the driver for park slews
             //slew (SA.....#) to park position
-            pkstepper.ClearBuffers();
-            pkstepper.Transmit("SA" + ParkAzimuth.ToString("0.##") + "#");
-            tl.LogMessage("Park", " implemented");
-           // pk commented out  throw new ASCOM.MethodNotImplementedException("Park");
+
+            //new code 5-3-19
+
+            // get current Az
+            int DiffMod;
+            double CurrentAzimuth = 0.0;
+            pkcompass.ClearBuffers();
+            pkcompass.Transmit("AZ#");
+
+            string response = pkcompass.ReceiveTerminated("#");
+            response = response.Replace("#", "");
+
+            double.TryParse(response, out CurrentAzimuth);
+            if (Math.Abs(CurrentAzimuth - ParkAzimuth) > 5.0)       // if the difference between current az and target az is >5 degrees in azimuth, do some movement
+            {
+                // new code below optimises movement to take the shortest distance
+                DiffMod = (int)(ParkAzimuth - CurrentAzimuth) % 360;   //int is convet to integer. % is the mod function
+                if (DiffMod >= 180)
+                {
+                    pkstepper.ClearBuffers();
+                    pkstepper.Transmit("CL" + CurrentAzimuth.ToString("0.##") + "#");
+                    pkstepper.Transmit("SA" + ParkAzimuth.ToString("0.##") + "#");
+                }
+
+                else   // the less than 180 scenario
+
+                {
+                    pkstepper.ClearBuffers();
+                    pkstepper.Transmit("CC" + CurrentAzimuth.ToString("0.##") + "#");
+                    pkstepper.Transmit("SA" + ParkAzimuth.ToString("0.##") + "#");
+                }
+
+                //end new code 5-3-19
+
+
+                /*old code
+                pkstepper.ClearBuffers();
+                pkstepper.Transmit("SA" + ParkAzimuth.ToString("0.##") + "#");
+                tl.LogMessage("Park", " implemented");
+               // pk commented out  throw new ASCOM.MethodNotImplementedException("Park");
+               */
+            }
+
         }
 
         public void SetPark()
@@ -527,11 +566,11 @@ namespace ASCOM.GowerCDome
 
             string response = pkcompass.ReceiveTerminated("#");
             response = response.Replace("#", "");
-            double az = 0;
+            double az = 0.0;
             if (double.TryParse(response, out az))
                  ParkAzimuth = az;
             else
-                ParkAzimuth = 90;                            // north east by default
+                ParkAzimuth = 90.0;                            // north east by default
 
        
             //endmycode
