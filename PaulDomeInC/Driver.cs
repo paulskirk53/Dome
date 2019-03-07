@@ -384,11 +384,11 @@ namespace ASCOM.GowerCDome
             }
         }
 
-        public double Azimuth
+        public double Azimuth  // try putting string myresponse and then return myresponse
         {
             get
             {
-
+                
                 //   pkcompass.Transmit("SA" + Azimuth.ToString("0.##") + "#");
                 pkcompass.ClearBuffers();
                 pkcompass.Transmit("AZ#");
@@ -397,9 +397,14 @@ namespace ASCOM.GowerCDome
                 response = response.Replace("#", "");
                 double az = 0;
                 if (double.TryParse(response, out az))
+                {
                     return az;
+                }
+
                 else
-                    return 1;
+                {
+                    return 17;
+                }
 
             }
         }
@@ -631,8 +636,10 @@ namespace ASCOM.GowerCDome
             // and comparing it to the target azimuth, then commands the slew and the direction
 
             // get current Az
-            int DiffMod;
+            int DiffMod, difference, part1, part2, part3;   //these are all local and used to claculate modulus in a particular way - not like the c# % function
+
             double CurrentAzimuth = 0.0;
+
             pkcompass.ClearBuffers();
             pkcompass.Transmit("AZ#");
 
@@ -640,10 +647,26 @@ namespace ASCOM.GowerCDome
             response = response.Replace("#", "");
 
             double.TryParse(response, out CurrentAzimuth);
-            if (Math.Abs(CurrentAzimuth - Azimuth) > 5.0)       // if the difference between current az and target az is >5 degrees in R.A. do some movement
+            if (Math.Abs(Azimuth - CurrentAzimuth) > 5.0)       // if the difference between current az and target az is >5 degrees in R.A. do some movement
             {
+                //new
+
+                difference = (int)(CurrentAzimuth-Azimuth);
+                part1 = (int)(difference / 360);
+                if (difference < 0)
+                {
+                    part1 = -1;
+                }
+                part2 = part1 * 360;
+                part3 = difference - part2;
+                DiffMod = part3;
+
+                // end new
+
                 // new code below optimises movement to take the shortest distance
-                DiffMod = (int)(Azimuth - CurrentAzimuth) % 360;
+
+               // this did not work and always ended up slewing in one direction  DiffMod = (int)(Azimuth - CurrentAzimuth) % 360;
+
                 if (DiffMod >= 180)
                 {
                     pkstepper.ClearBuffers();
