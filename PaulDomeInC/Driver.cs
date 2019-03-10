@@ -46,6 +46,8 @@ using System.Diagnostics;
 using System.Text;
 using System.Runtime.InteropServices;
 
+
+
 using ASCOM;
 using ASCOM.Astrometry;
 using ASCOM.Astrometry.AstroUtils;
@@ -56,6 +58,7 @@ using System.Collections;
 
 namespace ASCOM.GowerCDome
 {
+
     //
     // Your driver's DeviceID is ASCOM.GowerCDome.Dome
     //
@@ -122,6 +125,11 @@ namespace ASCOM.GowerCDome
         /// </summary>
         public Dome()
         {
+          
+        //    string message = "Debug box";
+        //    string title = "Debug";
+        //    MessageBox.Show(message, title);
+           
             tl = new TraceLogger("", "GowerCDome");
             ReadProfile(); // Read device configuration from the ASCOM Profile store
 
@@ -224,20 +232,127 @@ namespace ASCOM.GowerCDome
 
         public bool Connected
         {
+            get { return connectedState; }
+            set
+            {
+                tl.LogMessage("Connected Set", value.ToString());
+
+                if (value == connectedState) //  no change
+                {
+                    return;  // nothing to do
+                }
+
+                if (value)    // Connect requested
+                {
+                    connectedState = Connect();    // was IsConnected = Connect();
+                }
+                else    // Disconnect requested
+                {
+                    Disconnect();
+                    connectedState = false;  //was IsConnected = Disconnect();
+                }
+            }
+        }
+
+        // The following helper methods make the code more readable and eliminate redundant statements. 
+        // Notice that I also added a try/catch around the port connection to fail cleanly and log the failure. 
+        // I also added code to dispose and null each of the ports when they are closed.
+
+        private bool Connect()
+        {
+            tl.LogMessage("Connected Set", "Connecting to port " + comPort);
+            //set the stepper motor connection
+            try
+            {
+                pkstepper = OpenPort(StepperComPort);
+                // set the compass (now encoder) connection
+                pkcompass = OpenPort(CompassComPort);
+                return true;    //pk added cos of build error not all code paths return a value
+            }
+            catch (Exception ex)
+            {
+                tl.LogMessage("Connected Set", "Unable to connect to COM ports");
+
+                if (pkstepper != null)
+                {
+                    DisconnectPort(pkstepper);
+                }
+
+                if (pkcompass != null)
+                {
+                    DisconnectPort(pkcompass);
+                }
+                return false;   //pk added cos of build error not all code paths return a value
+            }
+        }
+
+        private ASCOM.Utilities.Serial OpenPort(string portName)
+        {
+            ASCOM.Utilities.Serial port = new ASCOM.Utilities.Serial();
+            port.PortName = portName;
+            port.DTREnable = false;
+            port.RTSEnable = false;
+            port.ReceiveTimeout = 10000;
+
+            port.Speed = SerialSpeed.ps115200;
+            port.Connected = true;
+            port.ClearBuffers();
+
+            return port;
+        }
+
+        private void Disconnect()
+        {
+            // disconnect the hardware
+            DisconnectPort(pkstepper);
+            DisconnectPort(pkcompass);
+            //           tl.LogMessage("Connected Set", "Disconnecting from port " + comPort);
+        }
+
+        private void DisconnectPort(ASCOM.Utilities.Serial port)
+        {
+            port.Connected = false;
+            port.Dispose();
+            port = null;
+        }
+
+
+
+        // end helper methods
+
+
+        public bool pkversion_of_Connected   // my version before advice from ASCOM Talk - this property is unused now - just kept as a record of the old code
+        {
             get
             {
                 tl.LogMessage("Connected Get", IsConnected.ToString());
                 return IsConnected;
             }
+
+            // ascom connected property extract:
+            // Set True to connect to the device hardware. Set False to disconnect from the device hardware. 
+            // You can also read the property to check whether it is connected. This reports the current hardware state. 
+
+
+// if device.connected is set to true (i.e. value = true) by the calling device, 'set' connects the hardware if it needs connecting
+
             set
             {
                 tl.LogMessage("Connected Set", value.ToString());
-                if (value == IsConnected)
-                    return;
-
-                if (value)
+                if ((value == true) && (IsConnected == true))         //  a request to connect has been sent but the connection is already established
                 {
-                    connectedState = true;
+                    return;  // nothing to do
+                }
+
+
+                if ((value == false) && (IsConnected == false))       //  a request to disonnect has been sent but there is no connection.
+                {
+                    return;  // nothing to do
+                }
+                
+                if ((value==true) && (IsConnected == false))         // a request to onnect has been sent and the connection is not yet made
+                {
+                    //set the stepper motor connection
                     tl.LogMessage("Connected Set", "Connecting to port " + comPort);
                     pkstepper = new ASCOM.Utilities.Serial();
                     pkstepper.Port = Convert.ToInt16(StepperComPort.Replace("COM", ""));
@@ -246,32 +361,31 @@ namespace ASCOM.GowerCDome
                     pkstepper.RTSEnable = false;
                     pkstepper.ReceiveTimeout = 10000;
 
-                    pkstepper.Speed = SerialSpeed.ps115200;            // was SerialSpeed.ps57600;
+                    pkstepper.Speed = SerialSpeed.ps115200;            
                     pkstepper.Connected = true;
                     pkstepper.ClearBuffers();
 
-                    // new code for separate stepper - below for initialising the compass port 
-                    // PK todo check the port number
-
+                    // set the compass (now encoder) connection
+                    
                     pkcompass = new ASCOM.Utilities.Serial();
-                    pkcompass.Port = Convert.ToInt16(CompassComPort.Replace("COM", ""));       // Convert.ToInt16(comPort.Replace("COM", ""));
+                    pkcompass.Port = Convert.ToInt16(CompassComPort.Replace("COM", ""));      
                     pkcompass.DTREnable = false;
                     pkcompass.RTSEnable = false;
                     pkcompass.ReceiveTimeout = 10000;
 
-                    pkcompass.Speed = SerialSpeed.ps115200; // was ps57600;   // todo check with arduino board
+                    pkcompass.Speed = SerialSpeed.ps115200;  // todo check with arduino board
                     pkcompass.Connected = true;
                     pkcompass.ClearBuffers();
-
-
-
-
                 }
-                else
+                
+                if ((value == false) && (IsConnected == true))    // a request to disconnet has been made and the connection is currently established
                 {
-                    connectedState = false;
-                    tl.LogMessage("Connected Set", "Disconnecting from port " + comPort);
-                    // TODO disconnect from the device
+                    // disconnect the hardware
+                    pkstepper.Connected = false;
+                    pkcompass.Connected = false;
+                    
+                    //           tl.LogMessage("Connected Set", "Disconnecting from port " + comPort);
+                    
                 }
             }
         }
@@ -324,7 +438,7 @@ namespace ASCOM.GowerCDome
         {
             get
             {
-                string name = "PK Dome";
+                string name = "Eras Dome";
                 tl.LogMessage("Name Get", name);
                 return name;
             }
@@ -370,7 +484,8 @@ namespace ASCOM.GowerCDome
                 // check if the current dome azimuth is = to ParkAzimuth
                 pkcompass.ClearBuffers();
                 pkcompass.Transmit("AZ#");
-                String AP_response = pkcompass.ReceiveTerminated("#");
+                pkcompass.Transmit("AZ#");
+                string AP_response = pkcompass.ReceiveTerminated("#");
                 AP_response = AP_response.Replace("#", "");                // AP_Response will contain the dome azimuth from the compass.
                double az = 0.0;
                double.TryParse(AP_response, out az);
@@ -388,11 +503,14 @@ namespace ASCOM.GowerCDome
         {
             get
             {
-                
+               // string stringtosend = "AZ#";
+                // bool x = pkcompass.Connected;
                 //   pkcompass.Transmit("SA" + Azimuth.ToString("0.##") + "#");
                 pkcompass.ClearBuffers();
+                //pkcompass.Transmit(stringtosend);
                 pkcompass.Transmit("AZ#");
-                
+                pkcompass.Transmit("AZ#");
+                pkcompass.Transmit("AZ#");
                 string response = pkcompass.ReceiveTerminated("#");
                 response = response.Replace("#", "");
                 double az = 0;
@@ -473,7 +591,7 @@ namespace ASCOM.GowerCDome
             get
             {
                 tl.LogMessage("CanSlave Get", false.ToString());
-                return true;                                                   //pk changed to true
+                return false;                                                   //pk changed to true
             }
         }
 
@@ -491,7 +609,8 @@ namespace ASCOM.GowerCDome
 
             pkstepper.ClearBuffers();
             pkstepper.Transmit("CS#");
-            
+            pkstepper.Transmit("CS#");
+
             tl.LogMessage("CloseShutter", "Shutter has been closed");
             domeShutterState = false;
         }
@@ -505,6 +624,7 @@ namespace ASCOM.GowerCDome
         public void OpenShutter()                                          // 13-4-17
         {
             pkstepper.ClearBuffers();
+            pkstepper.Transmit("OS#");
             pkstepper.Transmit("OS#");
 
             tl.LogMessage("OpenShutter", "Shutter has been opened");
@@ -642,6 +762,7 @@ namespace ASCOM.GowerCDome
 
             pkcompass.ClearBuffers();
             pkcompass.Transmit("AZ#");
+            pkcompass.Transmit("AZ#");
 
             string response = pkcompass.ReceiveTerminated("#");
             response = response.Replace("#", "");
@@ -717,6 +838,7 @@ namespace ASCOM.GowerCDome
             {
                 //new code below gets current azimuth from compass and sends it to the SL arduino process
                 pkcompass.ClearBuffers();
+                pkcompass.Transmit("AZ#");
                 pkcompass.Transmit("AZ#");
 
                 string response = pkcompass.ReceiveTerminated("#");
@@ -837,20 +959,20 @@ namespace ASCOM.GowerCDome
         {
             get
             {
-                // TODO check that the driver hardware connection exists and is connected to the hardware
-                // there are two arduino boards - one for stepper and one for compass, shutter open and close
-
+                return connectedState;
+             
 
                 // my code for this below
+                // 9-3-19 following advice from ASCOM Talk. The Connected property now sets connected state depending upon whether connection is made or unmade, so no need for the code below
 
-
+                /*
 
                 if ( (pkstepper != null) && (pkcompass != null) )  // IT IS SOMETHING
                 {
 
                     if ( (pkstepper.Connected)    && (pkcompass.Connected) )           // start block
                     {
-                        connectedState = true;
+                         connectedState = true;
                     }
                     else
                     {
@@ -860,16 +982,14 @@ namespace ASCOM.GowerCDome
                 }                                     // endif tue block pkstepper != NULL
                 else
                 {
-                    connectedState = false;
+                     connectedState = false;
                 }
               
-                 
-
-
                 // end mycode
-
+                
 
                 return connectedState;
+                */
             }
         }
 
