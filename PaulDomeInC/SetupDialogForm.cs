@@ -61,10 +61,18 @@ namespace ASCOM.GowerCDome
             comboBoxComPort.Items.AddRange(System.IO.Ports.SerialPort.GetPortNames());      // use System.IO because it's static
             comboBoxComPortStepper.Items.AddRange(System.IO.Ports.SerialPort.GetPortNames());  // pk code
             // select the current port if possible
-            if (comboBoxComPort.Items.Contains(Dome.comPort))   // see the driver code - this is set to a value of 4 - i.e. com4 is default
+            if (comboBoxComPort.Items.Contains(Dome.CompassComPort))   // see the driver code - this is set to a value of 4 - i.e. com4 is default
             {
-                comboBoxComPort.SelectedItem = Dome.comPort;    // the item that appears in the combobox at form load
+                comboBoxComPort.SelectedItem = Dome.CompassComPort;    // the item that appears in the combobox at form load
             }
+            //new
+
+            if (comboBoxComPortStepper.Items.Contains(Dome.StepperComPort))   // see the driver code - this is set in the connected proerty
+            {
+                comboBoxComPortStepper.SelectedItem = Dome.StepperComPort;    // the item that appears in the combobox at form load
+            }
+            //end new
+
         }
 
         private void comboBoxComPort_SelectedIndexChanged(object sender, EventArgs e)
