@@ -94,8 +94,8 @@ namespace ASCOM.GowerCDome
         internal static string traceStateDefault = "false";
 
         internal static string comPort; // Variables to hold the currrent device configuration
-        internal static string CompassComPort;
-        internal static string StepperComPort;
+        internal static string CompassComPort= "COM8";  // PK ADDED THESE to try to fix POTH connection error
+        internal static string StepperComPort = "COM3";
         /// <summary>
         /// Private variable to hold the connected state
         /// </summary>
@@ -483,7 +483,7 @@ namespace ASCOM.GowerCDome
                 //mycode
                 // check if the current dome azimuth is = to ParkAzimuth
                 pkcompass.ClearBuffers();
-                pkcompass.Transmit("AZ#");
+                pkcompass.Transmit("ZZ#");
                 pkcompass.Transmit("AZ#");
                 string AP_response = pkcompass.ReceiveTerminated("#");
                 AP_response = AP_response.Replace("#", "");                // AP_Response will contain the dome azimuth from the compass.
@@ -508,9 +508,21 @@ namespace ASCOM.GowerCDome
                 //   pkcompass.Transmit("SA" + Azimuth.ToString("0.##") + "#");
                 pkcompass.ClearBuffers();
                 //pkcompass.Transmit(stringtosend);
-                pkcompass.Transmit("AZ#");
-                pkcompass.Transmit("AZ#");
-                pkcompass.Transmit("AZ#");
+                // pkcompass.Transmit("ZZ#");
+                try
+                {
+                    pkcompass.Transmit("AZ#");
+                }
+                catch (Exception ex)
+                {
+                    pkcompass.Transmit("AZ#");
+                }
+                finally
+                {
+                    // re transmit
+                    pkcompass.Transmit("AZ#");
+                }
+
                 string response = pkcompass.ReceiveTerminated("#");
                 response = response.Replace("#", "");
                 double az = 0;
@@ -609,7 +621,7 @@ namespace ASCOM.GowerCDome
 
             pkstepper.ClearBuffers();
             pkstepper.Transmit("CS#");
-            pkstepper.Transmit("CS#");
+            
 
             tl.LogMessage("CloseShutter", "Shutter has been closed");
             domeShutterState = false;
@@ -625,7 +637,7 @@ namespace ASCOM.GowerCDome
         {
             pkstepper.ClearBuffers();
             pkstepper.Transmit("OS#");
-            pkstepper.Transmit("OS#");
+            
 
             tl.LogMessage("OpenShutter", "Shutter has been opened");
             domeShutterState = true;
@@ -762,7 +774,7 @@ namespace ASCOM.GowerCDome
 
             pkcompass.ClearBuffers();
             pkcompass.Transmit("AZ#");
-            pkcompass.Transmit("AZ#");
+            
 
             string response = pkcompass.ReceiveTerminated("#");
             response = response.Replace("#", "");
@@ -839,7 +851,7 @@ namespace ASCOM.GowerCDome
                 //new code below gets current azimuth from compass and sends it to the SL arduino process
                 pkcompass.ClearBuffers();
                 pkcompass.Transmit("AZ#");
-                pkcompass.Transmit("AZ#");
+                
 
                 string response = pkcompass.ReceiveTerminated("#");
                 response = response.Replace("#", "");
