@@ -1,6 +1,7 @@
 C:\Dome Driver GIT Repository\Dome\PaulDomeInC\bin\Debug\ASCOM.GowerCDome.Dome.dll.config
 C:\Dome Driver GIT Repository\Dome\PaulDomeInC\bin\Debug\ASCOM.GowerCDome.Dome.dll
 C:\Dome Driver GIT Repository\Dome\PaulDomeInC\bin\Debug\ASCOM.GowerCDome.Dome.pdb
+C:\Dome Driver GIT Repository\Dome\PaulDomeInC\bin\Debug\ASCOM.GowerCDome.Dome.tlb
 C:\Dome Driver GIT Repository\Dome\PaulDomeInC\bin\Debug\ASCOM.Astrometry.dll
 C:\Dome Driver GIT Repository\Dome\PaulDomeInC\bin\Debug\ASCOM.Attributes.dll
 C:\Dome Driver GIT Repository\Dome\PaulDomeInC\bin\Debug\ASCOM.Controls.dll
@@ -24,4 +25,3 @@ C:\Dome Driver GIT Repository\Dome\PaulDomeInC\obj\Debug\ASCOM.GowerCDome.SetupD
 C:\Dome Driver GIT Repository\Dome\PaulDomeInC\obj\Debug\PaulDomeInC.csproj.GenerateResource.Cache
 C:\Dome Driver GIT Repository\Dome\PaulDomeInC\obj\Debug\ASCOM.GowerCDome.Dome.dll
 C:\Dome Driver GIT Repository\Dome\PaulDomeInC\obj\Debug\ASCOM.GowerCDome.Dome.pdb
-C:\Dome Driver GIT Repository\Dome\PaulDomeInC\bin\Debug\ASCOM.GowerCDome.Dome.tlb

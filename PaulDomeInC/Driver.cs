@@ -235,7 +235,7 @@ namespace ASCOM.GowerCDome
             get { return connectedState; }
             set
             {
-                tl.LogMessage("Connected Set", value.ToString());
+                //tl.LogMessage("Connected Set", value.ToString());
 
                 if (value == connectedState) //  no change
                 {
@@ -438,7 +438,7 @@ namespace ASCOM.GowerCDome
         {
             get
             {
-                string name = "Eras Dome";
+                string name = "Gower Observatory";
                 tl.LogMessage("Name Get", name);
                 return name;
             }
@@ -1040,6 +1040,7 @@ namespace ASCOM.GowerCDome
                 driverProfile.DeviceType = "Dome";
                 driverProfile.WriteValue(driverID, traceStateProfileName, tl.Enabled.ToString());
                 driverProfile.WriteValue(driverID, comPortProfileName, comPort.ToString());
+                //driverProfile.WriteValue(driverID, StepperComPort, comPort.ToString());
             }
         }
 
