@@ -28,14 +28,14 @@ namespace ASCOM.GowerCDome
             Dome.tl.Enabled = chkTrace.Checked; 
             Dome.CompassComPort = (string)comboBoxComPort.SelectedItem;          //user selected port for compass
             Dome.StepperComPort = (string)comboBoxComPortStepper.SelectedItem;   //user selected port for stepper
-            
-            
+            //System.Windows.Forms.MessageBox.Show(Dome.StepperComPort);            // put in to test -pops up a dialog showing value of comport selected
+
             // new code
-            
+
             // open new gowerdome interface form - probably not here but in the chosser ok button if possible
-          //  this.Hide();
-           //  GowerDome_interface f2 = new GowerDome_interface();
-          //  f2.ShowDialog();
+            //  this.Hide();
+            //  GowerDome_interface f2 = new GowerDome_interface();
+            //  f2.ShowDialog();
 
 
             //end new code

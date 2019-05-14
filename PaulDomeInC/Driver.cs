@@ -162,8 +162,10 @@ namespace ASCOM.GowerCDome
         {
             // consider only showing the setup dialog if not connected
             // or call a different dialog if connected
-            if (IsConnected) 
-                System.Windows.Forms.MessageBox.Show("Already connected, just press OK");
+            if (IsConnected)
+          //  System.Windows.Forms.MessageBox.Show(Dome.CompassComPort);
+         //   System.Windows.Forms.MessageBox.Show(Dome.StepperComPort);
+            System.Windows.Forms.MessageBox.Show("Already connected, just press OK");
 
             using (SetupDialogForm F = new SetupDialogForm())
             {
@@ -239,10 +241,10 @@ namespace ASCOM.GowerCDome
             {
                 //tl.LogMessage("Connected Set", value.ToString());
 
-                if (value == connectedState) //  no change
-                {
-                    return;  // nothing to do
-                }
+              //  if (value == connectedState) //  no change
+             //   {
+               //     return;  // nothing to do
+               // }
 
                 if (value)    // Connect requested
                 {
@@ -279,7 +281,7 @@ namespace ASCOM.GowerCDome
                 {
                     DisconnectPort(pkstepper);
                 }
-
+                
                 if (pkcompass != null)
                 {
                     DisconnectPort(pkcompass);
@@ -298,7 +300,7 @@ namespace ASCOM.GowerCDome
             port.DTREnable = false;
             port.RTSEnable = false;
             port.ReceiveTimeout = 10000;
-
+            
             port.Speed = SerialSpeed.ps115200;
             port.Connected = true;
             port.ClearBuffers();
