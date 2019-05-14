@@ -28,6 +28,18 @@ namespace ASCOM.GowerCDome
             Dome.tl.Enabled = chkTrace.Checked; 
             Dome.CompassComPort = (string)comboBoxComPort.SelectedItem;          //user selected port for compass
             Dome.StepperComPort = (string)comboBoxComPortStepper.SelectedItem;   //user selected port for stepper
+            
+            
+            // new code
+            
+            // open new gowerdome interface form - probably not here but in the chosser ok button if possible
+          //  this.Hide();
+           //  GowerDome_interface f2 = new GowerDome_interface();
+          //  f2.ShowDialog();
+
+
+            //end new code
+
         }
 
         private void cmdCancel_Click(object sender, EventArgs e) // Cancel button event handler

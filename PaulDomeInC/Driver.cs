@@ -141,6 +141,8 @@ namespace ASCOM.GowerCDome
             //TODO: Implement your additional construction here
 
             tl.LogMessage("Dome", "Completed initialisation");
+          //   GowerDome_interface f2 = new GowerDome_interface();
+           //  f2.ShowDialog();
         }
 
 
@@ -283,7 +285,10 @@ namespace ASCOM.GowerCDome
                     DisconnectPort(pkcompass);
                 }
                 return false;   //pk added cos of build error not all code paths return a value
+               
             }
+            
+           
         }
 
         private ASCOM.Utilities.Serial OpenPort(string portName)
