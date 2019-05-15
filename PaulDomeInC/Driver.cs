@@ -94,8 +94,8 @@ namespace ASCOM.GowerCDome
         internal static string traceStateDefault = "false";
 
         internal static string comPort; // Variables to hold the currrent device configuration
-        internal static string CompassComPort= "COM8";  // PK ADDED THESE to try to fix POTH connection error
-        internal static string StepperComPort = "COM3";
+        internal static string CompassComPort= "COM12";  // PK ADDED THESE to try to fix POTH connection error
+        internal static string StepperComPort = "COM16";
         /// <summary>
         /// Private variable to hold the connected state
         /// </summary>
