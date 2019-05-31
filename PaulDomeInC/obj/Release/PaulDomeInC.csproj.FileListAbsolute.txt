@@ -24,3 +24,4 @@ C:\Dome Driver GIT Repository\Dome\PaulDomeInC\obj\Release\ASCOM.GowerCDome.Setu
 C:\Dome Driver GIT Repository\Dome\PaulDomeInC\obj\Release\PaulDomeInC.csproj.GenerateResource.Cache
 C:\Dome Driver GIT Repository\Dome\PaulDomeInC\obj\Release\ASCOM.GowerCDome.Dome.dll
 C:\Dome Driver GIT Repository\Dome\PaulDomeInC\obj\Release\ASCOM.GowerCDome.Dome.pdb
+C:\Dome Driver GIT Repository\Dome\PaulDomeInC\obj\Release\PaulDomeInC.csprojResolveAssemblyReference.cache

@@ -456,7 +456,7 @@ namespace ASCOM.GowerCDome
         #region IDome Implementation
 
         private bool domeShutterState = false; // Variable to hold the open/closed status of the shutter, true = Open
-        private double ParkAzimuth = 45.0;    //var for holding Setpark position PK mimic of above to try to help with park method 45 is North East
+        private double ParkAzimuth = 90.0;    //var for holding Setpark position PK mimic of above to try to help with park method 45 is North East
         
         public void AbortSlew()
         {
@@ -659,7 +659,10 @@ namespace ASCOM.GowerCDome
             //new code 5-3-19
 
             // get current Az
-            int DiffMod;
+
+            int DiffMod, difference, part1, part2, part3;   //these are all local and used to claculate modulus in a particular way - not like the c# % function
+
+
             double CurrentAzimuth = 0.0;
             pkcompass.ClearBuffers();
             pkcompass.Transmit("AZ#");
@@ -668,35 +671,48 @@ namespace ASCOM.GowerCDome
             response = response.Replace("#", "");
 
             double.TryParse(response, out CurrentAzimuth);
-            if (Math.Abs(CurrentAzimuth - ParkAzimuth) > 5.0)       // if the difference between current az and target az is >5 degrees in azimuth, do some movement
+            //new may31st 19
+
+            //new
+
+            difference = (int)(CurrentAzimuth - ParkAzimuth);
+            part1 = (int)(difference / 360);
+            if (difference < 0)
             {
-                // new code below optimises movement to take the shortest distance
-                DiffMod = (int)(ParkAzimuth - CurrentAzimuth) % 360;   //int is convet to integer. % is the mod function
-                if (DiffMod >= 180)
-                {
-                    pkstepper.ClearBuffers();
-                    pkstepper.Transmit("CL" + CurrentAzimuth.ToString("0.##") + "#");
-                    pkstepper.Transmit("SA" + ParkAzimuth.ToString("0.##") + "#");
-                }
-
-                else   // the less than 180 scenario
-
-                {
-                    pkstepper.ClearBuffers();
-                    pkstepper.Transmit("CC" + CurrentAzimuth.ToString("0.##") + "#");
-                    pkstepper.Transmit("SA" + ParkAzimuth.ToString("0.##") + "#");
-                }
-
-                //end new code 5-3-19
-
-
-                /*old code
-                pkstepper.ClearBuffers();
-                pkstepper.Transmit("SA" + ParkAzimuth.ToString("0.##") + "#");
-                tl.LogMessage("Park", " implemented");
-               // pk commented out  throw new ASCOM.MethodNotImplementedException("Park");
-               */
+                part1 = -1;
             }
+            part2 = part1 * 360;
+            part3 = difference - part2;
+            DiffMod = part3;
+
+            // end new
+
+            // new code below optimises movement to take the shortest distance
+
+            // this did not work and always ended up slewing in one direction  DiffMod = (int)(Azimuth - CurrentAzimuth) % 360;
+
+            if (DiffMod >= 180)
+            {
+                pkstepper.ClearBuffers();
+                pkstepper.Transmit("CL" + CurrentAzimuth.ToString("0.##") + "#");
+                pkstepper.Transmit("SA" + ParkAzimuth.ToString("0.##") + "#");
+            }
+
+            else   // the less than 180 scenario
+
+            {
+                pkstepper.ClearBuffers();
+                pkstepper.Transmit("CC" + CurrentAzimuth.ToString("0.##") + "#");
+                pkstepper.Transmit("SA" + ParkAzimuth.ToString("0.##") + "#");
+            }
+
+            //end new code 12-2-19
+
+
+
+            // end new 31st May 19  
+
+            
 
         }
 
