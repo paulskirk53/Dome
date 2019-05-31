@@ -767,6 +767,9 @@ namespace ASCOM.GowerCDome
 
         public void SlewToAzimuth(double Azimuth)
         {
+
+            //31st May 19 took out the if stmt which needed more than 5 degree difference in order to issue the move command.
+            // 
             tl.LogMessage("SA", "Started to implement");
             // throw new ASCOM.MethodNotImplementedException("SlewToAzimuth");
 
@@ -787,8 +790,8 @@ namespace ASCOM.GowerCDome
             response = response.Replace("#", "");
 
             double.TryParse(response, out CurrentAzimuth);
-            if (Math.Abs(Azimuth - CurrentAzimuth) > 5.0)       // if the difference between current az and target az is >5 degrees in R.A. do some movement
-            {
+         //   if (Math.Abs(Azimuth - CurrentAzimuth) > 1.0)       // if the difference between current az and target az is >1 degrees in Azimuth do some movement
+            //{
                 //new
 
                 difference = (int)(CurrentAzimuth-Azimuth);
@@ -848,7 +851,7 @@ namespace ASCOM.GowerCDome
 
                 */
 
-            }
+            
         }
 
         public bool Slewing
