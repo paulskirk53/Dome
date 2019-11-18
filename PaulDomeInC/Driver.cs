@@ -456,7 +456,7 @@ namespace ASCOM.GowerCDome
         #region IDome Implementation
 
         private bool domeShutterState = false; // Variable to hold the open/closed status of the shutter, true = Open
-        private double ParkAzimuth = 90.0;    //var for holding Setpark position PK mimic of above to try to help with park method 45 is North East
+        private double ParkAzimuth = 270.0;    //var for holding Setpark position PK mimic of above to try to help with park method.
         
         public void AbortSlew()
         {
@@ -720,7 +720,7 @@ namespace ASCOM.GowerCDome
         {
             //mycode
             //get the current azimuth 1st
-            ParkAzimuth = 90.0;                        // shutter faces into woodland on park
+            ParkAzimuth = 270.0;                        // west
             pkcompass.ClearBuffers();
             pkcompass.Transmit("AZ#");
 
@@ -730,7 +730,7 @@ namespace ASCOM.GowerCDome
             if (double.TryParse(response, out az))
                  ParkAzimuth = az;
             else
-                ParkAzimuth = 90.0;                            // north east by default
+                ParkAzimuth = 270.0;                            // west by default
 
        
             //endmycode
