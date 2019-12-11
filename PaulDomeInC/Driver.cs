@@ -719,8 +719,10 @@ namespace ASCOM.GowerCDome
         public void SetPark()
         {
             //mycode
+            
+            ParkAzimuth = 261.0;                        // west corresponds to scope Az = 270 degrees
+
             //get the current azimuth 1st
-            ParkAzimuth = 270.0;                        // west
             pkcompass.ClearBuffers();
             pkcompass.Transmit("AZ#");
 
@@ -730,7 +732,7 @@ namespace ASCOM.GowerCDome
             if (double.TryParse(response, out az))
                  ParkAzimuth = az;
             else
-                ParkAzimuth = 270.0;                            // west by default
+                ParkAzimuth = 261.0;                            // west by default
 
        
             //endmycode

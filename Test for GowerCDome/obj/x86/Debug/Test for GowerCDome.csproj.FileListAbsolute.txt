@@ -9,6 +9,5 @@ C:\Dome Driver GIT Repository\Dome\Test for GowerCDome\bin\Debug\ASCOM.DeviceInt
 C:\Dome Driver GIT Repository\Dome\Test for GowerCDome\bin\Debug\ASCOM.DriverAccess.xml
 C:\Dome Driver GIT Repository\Dome\Test for GowerCDome\bin\Debug\ASCOM.Utilities.xml
 C:\Dome Driver GIT Repository\Dome\Test for GowerCDome\bin\Debug\ASCOM.Exceptions.xml
-C:\Dome Driver GIT Repository\Dome\Test for GowerCDome\obj\x86\Debug\Test for GowerCDome.csprojResolveAssemblyReference.cache
 C:\Dome Driver GIT Repository\Dome\Test for GowerCDome\obj\x86\Debug\ASCOM.GowerCDome.Test.exe
 C:\Dome Driver GIT Repository\Dome\Test for GowerCDome\obj\x86\Debug\ASCOM.GowerCDome.Test.pdb
