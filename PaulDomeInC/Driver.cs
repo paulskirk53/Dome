@@ -456,7 +456,7 @@ namespace ASCOM.GowerCDome
         #region IDome Implementation
 
         private bool domeShutterState = false; // Variable to hold the open/closed status of the shutter, true = Open
-        private double ParkAzimuth = 270.0;    //var for holding Setpark position PK mimic of above to try to help with park method.
+        private double ParkAzimuth;    //var for holding Setpark position PK mimic of above to try to help with park method.
         
         public void AbortSlew()
         {
