@@ -89,13 +89,19 @@ namespace ASCOM.GowerCDome
         private static string driverDescription = "ASCOM Gower Observatory 2017.";
 
         internal static string comPortProfileName = "COM Port"; // Constants used for Profile persistence
+        internal static string StepperPortProfileName = "Stepper Port";
+        internal static string CompassEncoderPortProfileName = "Encoder Port";
+        internal static string SetParkProfilename = "Set Park";
         internal static string comPortDefault = "COM4";
+
         internal static string traceStateProfileName = "Trace Level";
         internal static string traceStateDefault = "false";
 
         internal static string comPort; // Variables to hold the currrent device configuration
         internal static string CompassComPort= "COM12";  // PK ADDED THESE to try to fix POTH connection error
         internal static string StepperComPort = "COM16";
+        internal static string Parkplace;
+        internal static double ParkAzimuth;
         /// <summary>
         /// Private variable to hold the connected state
         /// </summary>
@@ -456,7 +462,7 @@ namespace ASCOM.GowerCDome
         #region IDome Implementation
 
         private bool domeShutterState = false; // Variable to hold the open/closed status of the shutter, true = Open
-        private double ParkAzimuth;    //var for holding Setpark position PK mimic of above to try to help with park method.
+       // public double ParkAzimuth;    //var for holding Setpark position PK mimic of above to try to help with park method.
         
         public void AbortSlew()
         {
@@ -1050,11 +1056,17 @@ namespace ASCOM.GowerCDome
         /// </summary>
         internal void ReadProfile()
         {
+             string temp;
             using (Profile driverProfile = new Profile())
             {
                 driverProfile.DeviceType = "Dome";
                 tl.Enabled = Convert.ToBoolean(driverProfile.GetValue(driverID, traceStateProfileName, string.Empty, traceStateDefault));
-                comPort = driverProfile.GetValue(driverID, comPortProfileName, string.Empty, comPortDefault);
+                // comPort = driverProfile.GetValue(driverID, comPortProfileName, string.Empty, comPortDefault);
+                CompassComPort = driverProfile.GetValue(driverID, CompassEncoderPortProfileName, string.Empty, CompassComPort);
+                StepperComPort = driverProfile.GetValue(driverID, StepperPortProfileName, string.Empty, StepperComPort);
+                temp =  driverProfile.GetValue(driverID, SetParkProfilename, Parkplace);
+                double.TryParse(temp, out ParkAzimuth);   // this line sets the initial value of ParkAzimuth
+               
             }
         }
 
@@ -1067,7 +1079,11 @@ namespace ASCOM.GowerCDome
             {
                 driverProfile.DeviceType = "Dome";
                 driverProfile.WriteValue(driverID, traceStateProfileName, tl.Enabled.ToString());
-                driverProfile.WriteValue(driverID, comPortProfileName, comPort.ToString());
+                
+                driverProfile.WriteValue(driverID, StepperPortProfileName, StepperComPort.ToString());
+                driverProfile.WriteValue(driverID, CompassEncoderPortProfileName, CompassComPort.ToString());
+                driverProfile.WriteValue(driverID, SetParkProfilename, Parkplace.ToString());
+
                 //driverProfile.WriteValue(driverID, StepperComPort, comPort.ToString());
             }
         }

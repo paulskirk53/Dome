@@ -37,14 +37,17 @@ namespace ASCOM.GowerCDome
             this.comboBoxComPort = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
             this.comboBoxComPortStepper = new System.Windows.Forms.ComboBox();
+            this.numericUpDownParkAzimuth = new System.Windows.Forms.NumericUpDown();
+            this.lblparkazimuth = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownParkAzimuth)).BeginInit();
             this.SuspendLayout();
             // 
             // cmdOK
             // 
             this.cmdOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cmdOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.cmdOK.Location = new System.Drawing.Point(347, 182);
+            this.cmdOK.Location = new System.Drawing.Point(347, 207);
             this.cmdOK.Name = "cmdOK";
             this.cmdOK.Size = new System.Drawing.Size(59, 24);
             this.cmdOK.TabIndex = 0;
@@ -56,7 +59,7 @@ namespace ASCOM.GowerCDome
             // 
             this.cmdCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cmdCancel.Location = new System.Drawing.Point(347, 212);
+            this.cmdCancel.Location = new System.Drawing.Point(347, 237);
             this.cmdCancel.Name = "cmdCancel";
             this.cmdCancel.Size = new System.Drawing.Size(59, 25);
             this.cmdCancel.TabIndex = 1;
@@ -98,7 +101,7 @@ namespace ASCOM.GowerCDome
             // chkTrace
             // 
             this.chkTrace.AutoSize = true;
-            this.chkTrace.Location = new System.Drawing.Point(15, 212);
+            this.chkTrace.Location = new System.Drawing.Point(12, 237);
             this.chkTrace.Name = "chkTrace";
             this.chkTrace.Size = new System.Drawing.Size(69, 17);
             this.chkTrace.TabIndex = 6;
@@ -133,11 +136,47 @@ namespace ASCOM.GowerCDome
             this.comboBoxComPortStepper.Size = new System.Drawing.Size(88, 21);
             this.comboBoxComPortStepper.TabIndex = 9;
             // 
+            // numericUpDownParkAzimuth
+            // 
+            this.numericUpDownParkAzimuth.Increment = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.numericUpDownParkAzimuth.Location = new System.Drawing.Point(173, 186);
+            this.numericUpDownParkAzimuth.Maximum = new decimal(new int[] {
+            360,
+            0,
+            0,
+            0});
+            this.numericUpDownParkAzimuth.Name = "numericUpDownParkAzimuth";
+            this.numericUpDownParkAzimuth.Size = new System.Drawing.Size(85, 20);
+            this.numericUpDownParkAzimuth.TabIndex = 10;
+            this.numericUpDownParkAzimuth.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.numericUpDownParkAzimuth.Value = new decimal(new int[] {
+            261,
+            0,
+            0,
+            0});
+            this.numericUpDownParkAzimuth.ValueChanged += new System.EventHandler(this.numericUpDownParkAzimuth_ValueChanged);
+            // 
+            // lblparkazimuth
+            // 
+            this.lblparkazimuth.AutoSize = true;
+            this.lblparkazimuth.Location = new System.Drawing.Point(25, 183);
+            this.lblparkazimuth.Name = "lblparkazimuth";
+            this.lblparkazimuth.Size = new System.Drawing.Size(66, 13);
+            this.lblparkazimuth.TabIndex = 11;
+            this.lblparkazimuth.Text = "ParkAzimuth";
+            this.lblparkazimuth.Visible = false;
+            // 
             // SetupDialogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(416, 245);
+            this.ClientSize = new System.Drawing.Size(416, 270);
+            this.Controls.Add(this.lblparkazimuth);
+            this.Controls.Add(this.numericUpDownParkAzimuth);
             this.Controls.Add(this.comboBoxComPortStepper);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.comboBoxComPort);
@@ -154,7 +193,9 @@ namespace ASCOM.GowerCDome
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Gower Dome Setup";
+            this.Load += new System.EventHandler(this.SetupDialogForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownParkAzimuth)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -171,5 +212,7 @@ namespace ASCOM.GowerCDome
         private System.Windows.Forms.ComboBox comboBoxComPort;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ComboBox comboBoxComPortStepper;
+        private System.Windows.Forms.NumericUpDown numericUpDownParkAzimuth;
+        private System.Windows.Forms.Label lblparkazimuth;
     }
 }
