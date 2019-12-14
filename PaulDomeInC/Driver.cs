@@ -668,7 +668,6 @@ namespace ASCOM.GowerCDome
 
             int DiffMod, difference, part1, part2, part3;   //these are all local and used to claculate modulus in a particular way - not like the c# % function
 
-
             double CurrentAzimuth = 0.0;
             pkcompass.ClearBuffers();
             pkcompass.Transmit("AZ#");
@@ -726,7 +725,7 @@ namespace ASCOM.GowerCDome
         {
             //mycode
             
-            ParkAzimuth = 261.0;                        // west corresponds to scope Az = 270 degrees
+           // ParkAzimuth = 261.0;                        // west corresponds to scope Az = 270 degrees
 
             //get the current azimuth 1st
             pkcompass.ClearBuffers();
