@@ -117,6 +117,9 @@ namespace ASCOM
 
             */
              device.Connected = true;
+
+            
+
            double pkazimuth = 2.00;                                               // for tests
 
            while (pkazimuth < 360.0)                                           // coninuous loop for testing
@@ -124,8 +127,9 @@ namespace ASCOM
 
 
                Console.WriteLine("connection status  " + device.Connected);          // show connection status
+          //      Console.WriteLine("Slewing status  " + device.Slewing);
 
-               Console.Write("New Azimuth value ? a number > 360 exits the routine :");                            // invite user input for azimuth tests
+                Console.Write("New Azimuth value ? a number > 360 exits the routine :");                            // invite user input for azimuth tests
 
                string response = Console.ReadLine();
 

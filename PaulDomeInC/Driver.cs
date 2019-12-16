@@ -105,7 +105,8 @@ namespace ASCOM.GowerCDome
         /// <summary>
         /// Private variable to hold the connected state
         /// </summary>
-        private bool connectedState;
+        //was this private bool connectedState;
+        public bool connectedState;
 
         /// <summary>
         /// Private variable to hold an ASCOM Utilities object
