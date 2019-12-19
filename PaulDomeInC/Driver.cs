@@ -630,65 +630,47 @@ namespace ASCOM.GowerCDome
 
         public void Park()
         {
-             // get current Az
-
-            int DiffMod, difference, part1, part2, part3;   //these are all local and used to claculate modulus in a particular way - not like the c# % function
-
-            double CurrentAzimuth = 0.0;
-            pkcompass.ClearBuffers();
-            pkcompass.Transmit("AZ#");
-
-            string response = pkcompass.ReceiveTerminated("#");
-            response = response.Replace("#", "");
-
-            double.TryParse(response, out CurrentAzimuth);
-          
-            difference = (int)(CurrentAzimuth - ParkAzimuth);
-            part1 = (int)(difference / 360);
-            if (difference < 0)
-            {
-                part1 = -1;
-            }
-            part2 = part1 * 360;
-            part3 = difference - part2;
-            DiffMod = part3;
-
-            // end new
-
-            // new code below optimises movement to take the shortest distance
-
-            if (DiffMod >= 180)
-            {
-                pkstepper.ClearBuffers();
-                pkstepper.Transmit("CL" + CurrentAzimuth.ToString("0.##") + "#");
-                pkstepper.Transmit("SA" + ParkAzimuth.ToString("0.##") + "#");
-            }
-
-            else   // the less than 180 scenario
-
-            {
-                pkstepper.ClearBuffers();
-                pkstepper.Transmit("CC" + CurrentAzimuth.ToString("0.##") + "#");
-                pkstepper.Transmit("SA" + ParkAzimuth.ToString("0.##") + "#");
-            }
-
+            SlewToAzimuth(ParkAzimuth);
          }
 
         public void SetPark()
         {
             //mycode
-            
             //get the current azimuth 1st
-            pkcompass.ClearBuffers();
-            pkcompass.Transmit("AZ#");
+            try                          // new Dec 19
+            {
+                pkcompass.ClearBuffers();
+                pkcompass.Transmit("AZ#");
+            }
+            catch (Exception ex)
+            {
+                pkcompass.ClearBuffers();
+                pkcompass.Transmit("AZ#");
+                tl.LogMessage("SetPark", ex.ToString()); 
+            }
+            // these two stmts now in the try catch pkcompass.ClearBuffers();
+            //                                      pkcompass.Transmit("AZ#");
+            try
+            {
+                string response = pkcompass.ReceiveTerminated("#");
+                response = response.Replace("#", "");
+                double az = 0.0;
+                if (double.TryParse(response, out az))
+                {
+                    ParkAzimuth = az;
+                }
+                else
+                {
+                    ParkAzimuth = 261.0;                            // scope west by default
+                }
+            }
 
-            string response = pkcompass.ReceiveTerminated("#");
-            response = response.Replace("#", "");
-            double az = 0.0;
-            if (double.TryParse(response, out az))
-                 ParkAzimuth = az;
-            else
-                ParkAzimuth = 261.0;                            // scope west by default
+            catch (Exception ex)
+            {
+                tl.LogMessage("Receiving Azimuth fail in SetPark", ex.ToString()); ;
+                ParkAzimuth = 261.0;                            // scope west by default 
+            }
+ 
 
        
             //endmycode
