@@ -6,14 +6,7 @@
 //
 // Description:	Part one - THIS IS THE WORKING PROJECT FILE. iT has been tested initially with POTH 
 //				and a planetarium programme cartes du ciel. Also with SGP
-//				Needs a lot more testing and also setting a park position if required and
-//				registering it all i.e. compass due south and slit same?????
 //
-//				Part two - on 2-1-18 I added this solution to subversion (visualSvn -> add solution to subversion)
-//              The changes here reflect the need to separate the two arduino boards - one for compass
-//              and one for the steppers.
-//              The solution for two boards is in development as of this adition to SVN
-//              the previous version stored at paul/domeinc/ remains, but works with one arduino board
 //      Code for this revision is informd by 'dome driver program process - google sheets url
 //      https://docs.google.com/spreadsheets/d/129XTTVrI_Kxw_0QjSZ3ILjBEWEoGZlBaUu5U1P22TgM/edit#gid=0
 //
@@ -22,16 +15,12 @@
 // Author:		(XXX) Paul Kirk <your@email.here>, base code by Tom How, Curdridge Observatory
 //
 // Edit Log:
-// accessed just for reminder purposes 16-9-17
-// 4-3-17 populated connected, isconnected and azimuth
-// tested to print out dome azimuth from Arduino sketch
 //
 // Date			Who	Vers	Description
 // -----------	---	-----	-------------------------------------------------------
 // 4-3-2017	XXX	6.0.0	Initial edit, created from ASCOM driver template
 // --------------------------------------------------------------------------------
-// 14-8-17 just getting back into this - no changes just reviewing. It looks like the latest version 
-// with 'can' properties set appropriately
+
 // 14-8-17 tested with telescope sim for.net, POTH and C du Ciel - see notes in wordpad file  in folder 'domestuff'
 // stepper moves as expected when tracking and doing gotos in this simulator environment
 
@@ -86,20 +75,17 @@ namespace ASCOM.GowerCDome
         /// <summary>
         /// Driver description that displays in the ASCOM Chooser.
         /// </summary>
-        private static string driverDescription = "ASCOM Gower Observatory 2017.";
-
-        internal static string comPortProfileName = "COM Port"; // Constants used for Profile persistence
-        internal static string StepperPortProfileName = "Stepper Port";
+        private static string driverDescription              = "ASCOM Gower Observatory 2017.";
+        internal static string comPortProfileName            = "COM Port"; // Constants used for Profile persistence
+        internal static string StepperPortProfileName        = "Stepper Port";
         internal static string CompassEncoderPortProfileName = "Encoder Port";
-        internal static string SetParkProfilename = "Set Park";
-        internal static string comPortDefault = "COM4";
-
-        internal static string traceStateProfileName = "Trace Level";
-        internal static string traceStateDefault = "false";
-
-        internal static string comPort; // Variables to hold the currrent device configuration
-        internal static string CompassComPort= "COM12";  // PK ADDED THESE to try to fix POTH connection error
-        internal static string StepperComPort = "COM16";
+        internal static string SetParkProfilename            = "Set Park";
+        internal static string comPortDefault                = "COM4";
+        internal static string traceStateProfileName         = "Trace Level";
+        internal static string traceStateDefault             = "false";
+        internal static string comPort;                  // Variables to hold the currrent device configuration
+        internal static string CompassComPort;          // PK ADDED THESE ...
+        internal static string StepperComPort;
         internal static string Parkplace;
         internal static double ParkAzimuth;
         /// <summary>
@@ -132,10 +118,6 @@ namespace ASCOM.GowerCDome
         /// </summary>
         public Dome()
         {
-          
-        //    string message = "Debug box";
-        //    string title = "Debug";
-        //    MessageBox.Show(message, title);
            
             tl = new TraceLogger("", "GowerCDome");
             ReadProfile(); // Read device configuration from the ASCOM Profile store
@@ -148,8 +130,7 @@ namespace ASCOM.GowerCDome
             //TODO: Implement your additional construction here
 
             tl.LogMessage("Dome", "Completed initialisation");
-          //   GowerDome_interface f2 = new GowerDome_interface();
-           //  f2.ShowDialog();
+
         }
 
 
@@ -170,8 +151,7 @@ namespace ASCOM.GowerCDome
             // consider only showing the setup dialog if not connected
             // or call a different dialog if connected
             if (IsConnected)
-          //  System.Windows.Forms.MessageBox.Show(Dome.CompassComPort);
-         //   System.Windows.Forms.MessageBox.Show(Dome.StepperComPort);
+          
             System.Windows.Forms.MessageBox.Show("Already connected, just press OK");
 
             using (SetupDialogForm F = new SetupDialogForm())
@@ -246,21 +226,16 @@ namespace ASCOM.GowerCDome
             get { return connectedState; }
             set
             {
-                //tl.LogMessage("Connected Set", value.ToString());
-
-              //  if (value == connectedState) //  no change
-             //   {
-               //     return;  // nothing to do
-               // }
+ 
 
                 if (value)    // Connect requested
                 {
-                    connectedState = Connect();    // was IsConnected = Connect();
+                    connectedState = Connect();    
                 }
                 else    // Disconnect requested
                 {
                     Disconnect();
-                    connectedState = false;  //was IsConnected = Disconnect();
+                    connectedState = false;  
                 }
             }
         }
@@ -271,7 +246,7 @@ namespace ASCOM.GowerCDome
 
         private bool Connect()
         {
-            tl.LogMessage("Connected Set", "Connecting to port " + comPort);
+            tl.LogMessage("Connected Set", "Connecting to port " + StepperComPort );
             //set the stepper motor connection
             try
             {
@@ -282,7 +257,7 @@ namespace ASCOM.GowerCDome
             }
             catch (Exception ex)
             {
-                tl.LogMessage("Connected Set", "Unable to connect to COM ports");
+                tl.LogMessage("Connected Set", "Unable to connect to COM ports " + ex.ToString());
 
                 if (pkstepper != null)
                 {
@@ -503,7 +478,7 @@ namespace ASCOM.GowerCDome
                 AP_response = AP_response.Replace("#", "");                // AP_Response will contain the dome azimuth from the compass.
                double az = 0.0;
                double.TryParse(AP_response, out az);
-                if (Math.Abs(az - ParkAzimuth) <= 10.0)                      // does this work correctly on double DT?
+                if (Math.Abs(az - ParkAzimuth) <= 10.0)                      
                     return true;
                 else
                     return false;
@@ -513,22 +488,20 @@ namespace ASCOM.GowerCDome
             }
         }
 
-        public double Azimuth  // try putting string myresponse and then return myresponse
+        public double Azimuth 
         {
             get
             {
-               // string stringtosend = "AZ#";
-                // bool x = pkcompass.Connected;
-                //   pkcompass.Transmit("SA" + Azimuth.ToString("0.##") + "#");
+              
                 pkcompass.ClearBuffers();
-                //pkcompass.Transmit(stringtosend);
-                // pkcompass.Transmit("ZZ#");
+              
                 try
                 {
                     pkcompass.Transmit("AZ#");
                 }
                 catch (Exception ex)
                 {
+                    tl.LogMessage("Azimuth", ex.ToString() );
                     pkcompass.Transmit("AZ#");
                 }
                 finally
@@ -558,7 +531,7 @@ namespace ASCOM.GowerCDome
             get
             {
                 tl.LogMessage("CanFindHome Get", false.ToString());
-                return false;                                        //PK set these to true if the driver can do them?????
+                return false;                                        
             }
         }
 
@@ -567,8 +540,7 @@ namespace ASCOM.GowerCDome
             get
             {
                 tl.LogMessage("CanPark Get", false.ToString());
-                // return false;
-                // pk changed to return true
+
                 return true;
             }
         }
@@ -597,8 +569,7 @@ namespace ASCOM.GowerCDome
             get
             {
                 tl.LogMessage("CanSetPark Get", false.ToString());
-                //return false;
-                // pk changed to return true
+
                 return true;
             }
         }
@@ -659,13 +630,7 @@ namespace ASCOM.GowerCDome
 
         public void Park()
         {
-            //4-3-19 the old code below is insufficient - the stepper needs CLcurrentaz# followed by SAParkAzimuth# and Sl comands in order to slowdown/ stop
-            // the CL and Sa are in our control but will need to check is SL is issued by the driver for park slews
-            //slew (SA.....#) to park position
-
-            //new code 5-3-19
-
-            // get current Az
+             // get current Az
 
             int DiffMod, difference, part1, part2, part3;   //these are all local and used to claculate modulus in a particular way - not like the c# % function
 
@@ -677,10 +642,7 @@ namespace ASCOM.GowerCDome
             response = response.Replace("#", "");
 
             double.TryParse(response, out CurrentAzimuth);
-            //new may31st 19
-
-            //new
-
+          
             difference = (int)(CurrentAzimuth - ParkAzimuth);
             part1 = (int)(difference / 360);
             if (difference < 0)
@@ -694,8 +656,6 @@ namespace ASCOM.GowerCDome
             // end new
 
             // new code below optimises movement to take the shortest distance
-
-            // this did not work and always ended up slewing in one direction  DiffMod = (int)(Azimuth - CurrentAzimuth) % 360;
 
             if (DiffMod >= 180)
             {
@@ -712,22 +672,12 @@ namespace ASCOM.GowerCDome
                 pkstepper.Transmit("SA" + ParkAzimuth.ToString("0.##") + "#");
             }
 
-            //end new code 12-2-19
-
-
-
-            // end new 31st May 19  
-
-            
-
-        }
+         }
 
         public void SetPark()
         {
             //mycode
             
-           // ParkAzimuth = 261.0;                        // west corresponds to scope Az = 270 degrees
-
             //get the current azimuth 1st
             pkcompass.ClearBuffers();
             pkcompass.Transmit("AZ#");
@@ -738,7 +688,7 @@ namespace ASCOM.GowerCDome
             if (double.TryParse(response, out az))
                  ParkAzimuth = az;
             else
-                ParkAzimuth = 261.0;                            // west by default
+                ParkAzimuth = 261.0;                            // scope west by default
 
        
             //endmycode
@@ -779,7 +729,7 @@ namespace ASCOM.GowerCDome
             {
                 tl.LogMessage("Slaved Set", "not implemented");
                 throw new ASCOM.PropertyNotImplementedException("Slaved", true);
-                                                                                 //pktodo?  see CanSlave too
+                                                                               
             }
         }
 
@@ -791,9 +741,7 @@ namespace ASCOM.GowerCDome
 
         public void SlewToAzimuth(double Azimuth)
         {
-
-            //31st May 19 took out the if stmt which needed more than 5 degree difference in order to issue the move command.
-            // 
+ 
             tl.LogMessage("SA", "Started to implement");
             // throw new ASCOM.MethodNotImplementedException("SlewToAzimuth");
 
@@ -814,10 +762,7 @@ namespace ASCOM.GowerCDome
             response = response.Replace("#", "");
 
             double.TryParse(response, out CurrentAzimuth);
-         //   if (Math.Abs(Azimuth - CurrentAzimuth) > 1.0)       // if the difference between current az and target az is >1 degrees in Azimuth do some movement
-            //{
-                //new
-
+    
                 difference = (int)(CurrentAzimuth-Azimuth);
                 part1 = (int)(difference / 360);
                 if (difference < 0)
@@ -832,8 +777,7 @@ namespace ASCOM.GowerCDome
 
                 // new code below optimises movement to take the shortest distance
 
-               // this did not work and always ended up slewing in one direction  DiffMod = (int)(Azimuth - CurrentAzimuth) % 360;
-
+         
                 if (DiffMod >= 180)
                 {
                     pkstepper.ClearBuffers();
@@ -848,41 +792,14 @@ namespace ASCOM.GowerCDome
                     pkstepper.Transmit("CC" + CurrentAzimuth.ToString("0.##") + "#");
                     pkstepper.Transmit("SA" + Azimuth.ToString("0.##") + "#");
                 }
-
-                //end new code 12-2-19
-                
-                
-                /* the old move to azimuth code commented out below 
-                 * 
-                if (Azimuth < CurrentAzimuth)                   // Counterclockwise movement required - check this empirically as motor direction may be incorrect
-                {
-                    pkstepper.ClearBuffers();
-                    //pkstepper.Transmit("CC#");                   removed the current CC# line here and take the opportunity to replace it as below sending the current az as well
-                    pkstepper.Transmit("CC" + CurrentAzimuth.ToString("0.##") + "#");
-
-                    pkstepper.Transmit("SA" + Azimuth.ToString("0.##") + "#");
-                }
-
-                if (Azimuth > CurrentAzimuth)  //clockwise movement required - check this empirically as motor direction may be incorrect
-                {
-                    pkstepper.ClearBuffers();
-                   // pkstepper.Transmit("CL#");                   remove the current CL# line here and take the opportunity to replace it as below sending the current az as well
-                    pkstepper.Transmit("CL" + CurrentAzimuth.ToString("0.##") + "#");
-
-                    pkstepper.Transmit("SA" + Azimuth.ToString("0.##") + "#");
-                    // pkstepper.Transmit(Azimuth.ToString("0.##") + "#");  
-                }
-
-                */
-
-            
+                           
         }
 
         public bool Slewing
         {
             get
             {
-                //new code below gets current azimuth from compass and sends it to the SL arduino process
+                //new code below gets current azimuth from encoder and sends it to the SL arduino process
                 pkcompass.ClearBuffers();
                 pkcompass.Transmit("AZ#");
                 
@@ -894,14 +811,14 @@ namespace ASCOM.GowerCDome
                 //end new code   
         
 
-                pkstepper.ClearBuffers();                              // this cured the receive problem from Arduino
+                pkstepper.ClearBuffers();                                         // this cured the receive problem from Arduino
                 tl.LogMessage("Slewing Get", false.ToString());
                 pkstepper.Transmit("SL" + CurrentAzimuth.ToString("0.##") + "#"); // changed from just sending SL, to this new pattern
-                                                                            // which accommodates the SL process in the stepper arduino
+                                                                                  // which accommodates the SL process in the stepper arduino
 
-                string SL_response = pkstepper.ReceiveTerminated("#"); // read what's sent back
-                SL_response = SL_response.Replace("#", "");           // remove the # mark
-                if (SL_response == "Moving")                          // set this condition properly
+                string SL_response = pkstepper.ReceiveTerminated("#");            // read what's sent back
+                SL_response = SL_response.Replace("#", "");                       // remove the # mark
+                if (SL_response == "Moving")                                      // set this condition properly
                 {
                     return true;
                 }
@@ -1006,36 +923,6 @@ namespace ASCOM.GowerCDome
             get
             {
                 return connectedState;
-             
-
-                // my code for this below
-                // 9-3-19 following advice from ASCOM Talk. The Connected property now sets connected state depending upon whether connection is made or unmade, so no need for the code below
-
-                /*
-
-                if ( (pkstepper != null) && (pkcompass != null) )  // IT IS SOMETHING
-                {
-
-                    if ( (pkstepper.Connected)    && (pkcompass.Connected) )           // start block
-                    {
-                         connectedState = true;
-                    }
-                    else
-                    {
-                        connectedState = false;
-                    }                                 // end block incl
-
-                }                                     // endif tue block pkstepper != NULL
-                else
-                {
-                     connectedState = false;
-                }
-              
-                // end mycode
-                
-
-                return connectedState;
-                */
             }
         }
 
@@ -1061,7 +948,7 @@ namespace ASCOM.GowerCDome
             {
                 driverProfile.DeviceType = "Dome";
                 tl.Enabled = Convert.ToBoolean(driverProfile.GetValue(driverID, traceStateProfileName, string.Empty, traceStateDefault));
-                // comPort = driverProfile.GetValue(driverID, comPortProfileName, string.Empty, comPortDefault);
+
                 CompassComPort = driverProfile.GetValue(driverID, CompassEncoderPortProfileName, string.Empty, CompassComPort);
                 StepperComPort = driverProfile.GetValue(driverID, StepperPortProfileName, string.Empty, StepperComPort);
                 temp =  driverProfile.GetValue(driverID, SetParkProfilename, Parkplace);
@@ -1083,8 +970,6 @@ namespace ASCOM.GowerCDome
                 driverProfile.WriteValue(driverID, StepperPortProfileName, StepperComPort.ToString());
                 driverProfile.WriteValue(driverID, CompassEncoderPortProfileName, CompassComPort.ToString());
                 driverProfile.WriteValue(driverID, SetParkProfilename, Parkplace.ToString());
-
-                //driverProfile.WriteValue(driverID, StepperComPort, comPort.ToString());
             }
         }
 
