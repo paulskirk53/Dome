@@ -471,14 +471,24 @@ namespace ASCOM.GowerCDome
             {
                 //mycode
                 // check if the current dome azimuth is = to ParkAzimuth
-                pkcompass.ClearBuffers();
-                pkcompass.Transmit("ZZ#");
-                pkcompass.Transmit("AZ#");
+                try
+                {
+                    pkcompass.ClearBuffers();
+                    pkcompass.Transmit("AZ#");
+                }
+                catch (Exception ex)
+                {
+                    pkcompass.ClearBuffers();
+                    pkcompass.Transmit("AZ#");
+                    //log
+                    tl.LogMessage("AtPark Get, failed to transmit AZ ", ex.ToString());
+                }
+               
                 string AP_response = pkcompass.ReceiveTerminated("#");
                 AP_response = AP_response.Replace("#", "");                // AP_Response will contain the dome azimuth from the compass.
                double az = 0.0;
                double.TryParse(AP_response, out az);
-                if (Math.Abs(az - ParkAzimuth) <= 10.0)                      
+                if (Math.Abs(az - ParkAzimuth) <= 1.0)                      
                     return true;
                 else
                     return false;
@@ -491,17 +501,15 @@ namespace ASCOM.GowerCDome
         public double Azimuth 
         {
             get
-            {
-              
-                pkcompass.ClearBuffers();
-              
+            {              
                 try
                 {
+                    pkcompass.ClearBuffers();
                     pkcompass.Transmit("AZ#");
                 }
                 catch (Exception ex)
                 {
-                    tl.LogMessage("Azimuth", ex.ToString() );
+                    tl.LogMessage("Azimuth failure to Tx AZ#", ex.ToString() );
                     pkcompass.Transmit("AZ#");
                 }
                 finally
@@ -513,17 +521,10 @@ namespace ASCOM.GowerCDome
                 string response = pkcompass.ReceiveTerminated("#");
                 response = response.Replace("#", "");
                 double az = 0;
-                if (double.TryParse(response, out az))
-                {
+                double.TryParse(response, out az);
+                
                     return az;
-                }
-
-                else
-                {
-                    return 17;
-                }
-
-            }
+              }
         }
 
         public bool CanFindHome
@@ -630,7 +631,10 @@ namespace ASCOM.GowerCDome
 
         public void Park()
         {
-            SlewToAzimuth(ParkAzimuth);
+            if (!AtPark)                     //if we're already there, do nothing
+            {
+                SlewToAzimuth(ParkAzimuth);
+            }
          }
 
         public void SetPark()
@@ -646,23 +650,17 @@ namespace ASCOM.GowerCDome
             {
                 pkcompass.ClearBuffers();
                 pkcompass.Transmit("AZ#");
-                tl.LogMessage("SetPark", ex.ToString()); 
+                tl.LogMessage("SetPark failure to Tx AZ#", ex.ToString()); 
             }
-            // these two stmts now in the try catch pkcompass.ClearBuffers();
-            //                                      pkcompass.Transmit("AZ#");
+
             try
             {
                 string response = pkcompass.ReceiveTerminated("#");
                 response = response.Replace("#", "");
                 double az = 0.0;
-                if (double.TryParse(response, out az))
-                {
-                    ParkAzimuth = az;
-                }
-                else
-                {
-                    ParkAzimuth = 261.0;                            // scope west by default
-                }
+                double.TryParse(response, out az);
+                
+                ParkAzimuth = az;                
             }
 
             catch (Exception ex)
@@ -735,9 +733,20 @@ namespace ASCOM.GowerCDome
             int DiffMod, difference, part1, part2, part3;   //these are all local and used to claculate modulus in a particular way - not like the c# % function
 
             double CurrentAzimuth = 0.0;
+            try
+            {
+                pkcompass.ClearBuffers();
+                pkcompass.Transmit("AZ#");
+            }
+            catch (Exception ex)
+            {
+                pkcompass.ClearBuffers();
+                pkcompass.Transmit("AZ#");
+                // log
+                tl.LogMessage("Slew to azimuth - attempt to get current az", ex.ToString());
 
-            pkcompass.ClearBuffers();
-            pkcompass.Transmit("AZ#");
+            }
+
             
 
             string response = pkcompass.ReceiveTerminated("#");
@@ -755,24 +764,51 @@ namespace ASCOM.GowerCDome
                 part3 = difference - part2;
                 DiffMod = part3;
 
-                // end new
+                
 
-                // new code below optimises movement to take the shortest distance
+                // code below optimises movement to take the shortest distance
 
          
                 if (DiffMod >= 180)
+                {
+                try
                 {
                     pkstepper.ClearBuffers();
                     pkstepper.Transmit("CL" + CurrentAzimuth.ToString("0.##") + "#");
                     pkstepper.Transmit("SA" + Azimuth.ToString("0.##") + "#");
                 }
+                catch (Exception ex)
+                {
+
+                    pkstepper.ClearBuffers();
+                    pkstepper.Transmit("CL" + CurrentAzimuth.ToString("0.##") + "#");
+                    pkstepper.Transmit("SA" + Azimuth.ToString("0.##") + "#");
+                    // log
+                    tl.LogMessage("Slew to azimuth - attempt to send CL and SA for angle > 180", ex.ToString());
+                }
+                 
+                }
 
                 else   // the less than 180 scenario
 
                 {
+
+                try
+                {
                     pkstepper.ClearBuffers();
                     pkstepper.Transmit("CC" + CurrentAzimuth.ToString("0.##") + "#");
                     pkstepper.Transmit("SA" + Azimuth.ToString("0.##") + "#");
+                }
+                catch (Exception ex)
+                {
+
+                    pkstepper.ClearBuffers();
+                    pkstepper.Transmit("CC" + CurrentAzimuth.ToString("0.##") + "#");
+                    pkstepper.Transmit("SA" + Azimuth.ToString("0.##") + "#");
+                    //log
+                    tl.LogMessage("Slew to azimuth - attempt to send CL and SA for angle < 180", ex.ToString());
+                }
+
                 }
                            
         }
@@ -782,21 +818,41 @@ namespace ASCOM.GowerCDome
             get
             {
                 //new code below gets current azimuth from encoder and sends it to the SL arduino process
-                pkcompass.ClearBuffers();
-                pkcompass.Transmit("AZ#");
-                
+                try
+                {
+                    pkcompass.ClearBuffers();
+                    pkcompass.Transmit("AZ#");
+                }
+                catch (Exception ex)
+                {
+
+                    pkcompass.ClearBuffers();
+                    pkcompass.Transmit("AZ#");
+                    //log fail
+                    tl.LogMessage("Slewing Get failed to Tx AZ#", ex.ToString());
+                }
 
                 string response = pkcompass.ReceiveTerminated("#");
                 response = response.Replace("#", "");
                 double CurrentAzimuth = 0.0;
                 double.TryParse(response, out CurrentAzimuth);
                 //end new code   
-        
 
-                pkstepper.ClearBuffers();                                         // this cured the receive problem from Arduino
                 tl.LogMessage("Slewing Get", false.ToString());
-                pkstepper.Transmit("SL" + CurrentAzimuth.ToString("0.##") + "#"); // changed from just sending SL, to this new pattern
-                                                                                  // which accommodates the SL process in the stepper arduino
+
+                try
+                {
+                    pkstepper.ClearBuffers();                                         // this cured the receive problem from Arduino             
+                    pkstepper.Transmit("SL" + CurrentAzimuth.ToString("0.##") + "#"); // changed from just sending SL, to this new pattern
+                                                                                      // which accommodates the SL process in the stepper arduino
+                }
+                catch (Exception ex)
+                {
+                    pkstepper.ClearBuffers();                                         
+                    pkstepper.Transmit("SL" + CurrentAzimuth.ToString("0.##") + "#");
+                    // log failure
+                    tl.LogMessage("Slewing Get failed to Tx SL#", ex.ToString());
+                }
 
                 string SL_response = pkstepper.ReceiveTerminated("#");            // read what's sent back
                 SL_response = SL_response.Replace("#", "");                       // remove the # mark
