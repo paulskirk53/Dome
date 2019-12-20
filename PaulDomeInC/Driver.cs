@@ -829,28 +829,44 @@ namespace ASCOM.GowerCDome
         {
             get
             {
-                //new code below gets current azimuth from encoder and sends it to the SL arduino process
-                try
-                {
-                    pkcompass.ClearBuffers();
-                    pkcompass.Transmit("AZ#");
-                }
-                catch (Exception ex)
-                {
 
-                    pkcompass.ClearBuffers();
-                    pkcompass.Transmit("AZ#");
-                    //log fail
-                    tl.LogMessage("Slewing Get failed to Tx AZ#", ex.ToString());
-                }
-
-                string response = pkcompass.ReceiveTerminated("#");
-                response = response.Replace("#", "");
+                int trycount = 0;
+                bool success = false;
                 double CurrentAzimuth = 0.0;
-                double.TryParse(response, out CurrentAzimuth);
-                //end new code   
 
-                tl.LogMessage("Slewing Get", false.ToString());
+                while (!success)            // success is defined in the double tryparse below
+                {
+                    //new code below gets current azimuth from encoder and sends it to the SL arduino process
+                    try
+                    {
+                        pkcompass.ClearBuffers();
+                        pkcompass.Transmit("AZ#");
+                    }
+                    catch (Exception ex)
+                    {
+
+                        pkcompass.ClearBuffers();
+                        pkcompass.Transmit("AZ#");
+                        //log fail
+                        tl.LogMessage("Slewing Get failed to Tx AZ#", ex.ToString());
+                    }
+
+                    string response = pkcompass.ReceiveTerminated("#");
+                    response = response.Replace("#", "");
+                   
+                    success = double.TryParse(response, out CurrentAzimuth);
+                    //end new code   
+
+                    tl.LogMessage("Slewing Get", false.ToString());
+
+                    trycount++;
+                    if (trycount>4)
+                    {
+                        break;                     // leaves the while loop
+                    }
+                        
+                }                                 //end while !success
+
 
                 try
                 {
