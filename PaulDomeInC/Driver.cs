@@ -471,24 +471,10 @@ namespace ASCOM.GowerCDome
             {
                 //mycode
                 // check if the current dome azimuth is = to ParkAzimuth
-                try
-                {
-                    pkcompass.ClearBuffers();
-                    pkcompass.Transmit("AZ#");
-                }
-                catch (Exception ex)
-                {
-                    pkcompass.ClearBuffers();
-                    pkcompass.Transmit("AZ#");
-                    //log
-                    tl.LogMessage("AtPark Get, failed to transmit AZ ", ex.ToString());
-                }
+                double CurrentAzimuth = Azimuth;     // note Azimuth is a dome property - see code for it.
                
-                string AP_response = pkcompass.ReceiveTerminated("#");
-                AP_response = AP_response.Replace("#", "");                // AP_Response will contain the dome azimuth from the compass.
-               double az = 0.0;
-               double.TryParse(AP_response, out az);
-                if (Math.Abs(az - ParkAzimuth) <= 1.0)                      
+ 
+                if (Math.Abs(CurrentAzimuth  - ParkAzimuth) <= 1.0)                      
                     return true;
                 else
                     return false;
@@ -501,28 +487,40 @@ namespace ASCOM.GowerCDome
         public double Azimuth 
         {
             get
-            {              
-                try
-                {
-                    pkcompass.ClearBuffers();
-                    pkcompass.Transmit("AZ#");
-                }
-                catch (Exception ex)
-                {
-                    tl.LogMessage("Azimuth failure to Tx AZ#", ex.ToString() );
-                    pkcompass.Transmit("AZ#");
-                }
-                finally
-                {
-                    // re transmit
-                    pkcompass.Transmit("AZ#");
-                }
+            {
 
-                string response = pkcompass.ReceiveTerminated("#");
-                response = response.Replace("#", "");
+                int trycount = 0;
+                bool success = false;
                 double az = 0;
-                double.TryParse(response, out az);
-                
+
+                while (!success)
+                {
+
+                    try
+                    {
+                        pkcompass.ClearBuffers();
+                        pkcompass.Transmit("AZ#");
+                    }
+                    catch (Exception ex)
+                    {
+                        tl.LogMessage("Azimuth property failure to Tx AZ#", ex.ToString());
+                        pkcompass.Transmit("AZ#");
+                    }
+
+
+                    string response = pkcompass.ReceiveTerminated("#");
+                    response = response.Replace("#", "");
+                    
+                    success = double.TryParse(response, out az);
+
+                    trycount++;
+
+                    if (trycount>4)
+                    {
+                        break;
+                    }
+
+                }
                     return az;
               }
         }
@@ -719,7 +717,7 @@ namespace ASCOM.GowerCDome
             throw new ASCOM.MethodNotImplementedException("SlewToAltitude");
         }
 
-        public void SlewToAzimuth(double Azimuth)
+        public void SlewToAzimuth(double TargetAzimuth)
         {
  
             tl.LogMessage("SA", "Started to implement");
@@ -732,41 +730,10 @@ namespace ASCOM.GowerCDome
             // get current Az
             int DiffMod, difference, part1, part2, part3;   //these are all local and used to claculate modulus in a particular way - not like the c# % function
 
-            double CurrentAzimuth = 0.0;
-            int trycount = 0;
-            bool success = false;
+            double CurrentAzimuth =  Azimuth ;  //this gets the current azimuth from the dome.Azimuth property  (see your code in Azimuth)
 
-            while (!success)
-            {
-                try
-                {
-                    pkcompass.ClearBuffers();
-                    pkcompass.Transmit("AZ#");
-                }
-                catch (Exception ex)
-                {
-                    pkcompass.ClearBuffers();
-                    pkcompass.Transmit("AZ#");
-                    // log
-                    tl.LogMessage("Slew to azimuth - attempt to get current az", ex.ToString());
-                    tl.LogMessage("Slew to azimuth - the number of retries was", trycount.ToString());
 
-                }
-
-                string response = pkcompass.ReceiveTerminated("#");
-                response = response.Replace("#", "");
-
-              success =  double.TryParse(response, out CurrentAzimuth);
-
-                trycount++;
-                if (trycount > 4)
-                {
-                    break;
-                }
-
-            }  // end while !succcess
-
-                difference = (int)(CurrentAzimuth-Azimuth);
+                difference = (int)(CurrentAzimuth-TargetAzimuth );
                 part1 = (int)(difference / 360);
                 if (difference < 0)
                 {
@@ -787,14 +754,14 @@ namespace ASCOM.GowerCDome
                 {
                     pkstepper.ClearBuffers();
                     pkstepper.Transmit("CL" + CurrentAzimuth.ToString("0.##") + "#");
-                    pkstepper.Transmit("SA" + Azimuth.ToString("0.##") + "#");
+                    pkstepper.Transmit("SA" + TargetAzimuth.ToString("0.##") + "#");
                 }
                 catch (Exception ex)
                 {
 
                     pkstepper.ClearBuffers();
                     pkstepper.Transmit("CL" + CurrentAzimuth.ToString("0.##") + "#");
-                    pkstepper.Transmit("SA" + Azimuth.ToString("0.##") + "#");
+                    pkstepper.Transmit("SA" + TargetAzimuth.ToString("0.##") + "#");
                     // log
                     tl.LogMessage("Slew to azimuth - attempt to send CL and SA for angle > 180", ex.ToString());
                 }
@@ -809,14 +776,14 @@ namespace ASCOM.GowerCDome
                 {
                     pkstepper.ClearBuffers();
                     pkstepper.Transmit("CC" + CurrentAzimuth.ToString("0.##") + "#");
-                    pkstepper.Transmit("SA" + Azimuth.ToString("0.##") + "#");
+                    pkstepper.Transmit("SA" + TargetAzimuth.ToString("0.##") + "#");
                 }
                 catch (Exception ex)
                 {
 
                     pkstepper.ClearBuffers();
                     pkstepper.Transmit("CC" + CurrentAzimuth.ToString("0.##") + "#");
-                    pkstepper.Transmit("SA" + Azimuth.ToString("0.##") + "#");
+                    pkstepper.Transmit("SA" + TargetAzimuth.ToString("0.##") + "#");
                     //log
                     tl.LogMessage("Slew to azimuth - attempt to send CL and SA for angle < 180", ex.ToString());
                 }
@@ -830,43 +797,10 @@ namespace ASCOM.GowerCDome
             get
             {
 
-                int trycount = 0;
-                bool success = false;
-                double CurrentAzimuth = 0.0;
+                double CurrentAzimuth = Azimuth;    // new on 20-12-19 see comment immediately below
 
-                while (!success)            // success is defined in the double tryparse below
-                {
-                    //new code below gets current azimuth from encoder and sends it to the SL arduino process
-                    try
-                    {
-                        pkcompass.ClearBuffers();
-                        pkcompass.Transmit("AZ#");
-                    }
-                    catch (Exception ex)
-                    {
-
-                        pkcompass.ClearBuffers();
-                        pkcompass.Transmit("AZ#");
-                        //log fail
-                        tl.LogMessage("Slewing Get failed to Tx AZ#", ex.ToString());
-                    }
-
-                    string response = pkcompass.ReceiveTerminated("#");
-                    response = response.Replace("#", "");
-                   
-                    success = double.TryParse(response, out CurrentAzimuth);
-                    //end new code   
-
-                    tl.LogMessage("Slewing Get", false.ToString());
-
-                    trycount++;
-                    if (trycount>4)
-                    {
-                        break;                     // leaves the while loop
-                    }
-                        
-                }                                 //end while !success
-
+                // the comment out below was because of the realisation that there is a propety built into the driver which provides the Azimuth
+                //so no need to Tx and Rx to get the current Azimuth
 
                 try
                 {
