@@ -733,27 +733,39 @@ namespace ASCOM.GowerCDome
             int DiffMod, difference, part1, part2, part3;   //these are all local and used to claculate modulus in a particular way - not like the c# % function
 
             double CurrentAzimuth = 0.0;
-            try
+            int trycount = 0;
+            bool success = false;
+
+            while (!success)
             {
-                pkcompass.ClearBuffers();
-                pkcompass.Transmit("AZ#");
-            }
-            catch (Exception ex)
-            {
-                pkcompass.ClearBuffers();
-                pkcompass.Transmit("AZ#");
-                // log
-                tl.LogMessage("Slew to azimuth - attempt to get current az", ex.ToString());
+                try
+                {
+                    pkcompass.ClearBuffers();
+                    pkcompass.Transmit("AZ#");
+                }
+                catch (Exception ex)
+                {
+                    pkcompass.ClearBuffers();
+                    pkcompass.Transmit("AZ#");
+                    // log
+                    tl.LogMessage("Slew to azimuth - attempt to get current az", ex.ToString());
+                    tl.LogMessage("Slew to azimuth - the number of retries was", trycount.ToString());
 
-            }
+                }
 
-            
+                string response = pkcompass.ReceiveTerminated("#");
+                response = response.Replace("#", "");
 
-            string response = pkcompass.ReceiveTerminated("#");
-            response = response.Replace("#", "");
+              success =  double.TryParse(response, out CurrentAzimuth);
 
-            double.TryParse(response, out CurrentAzimuth);
-    
+                trycount++;
+                if (trycount > 4)
+                {
+                    break;
+                }
+
+            }  // end while !succcess
+
                 difference = (int)(CurrentAzimuth-Azimuth);
                 part1 = (int)(difference / 360);
                 if (difference < 0)
