@@ -488,7 +488,7 @@ namespace ASCOM.GowerCDome
         {
             get
             {
-
+   
                 int trycount = 0;
                 bool success = false;
                 double az = 0;
@@ -499,7 +499,7 @@ namespace ASCOM.GowerCDome
                     try
                     {
                         pkcompass.ClearBuffers();
-                        pkcompass.Transmit("AZ#");
+                        pkcompass.Transmit("xx#");
                         pkcompass.Transmit("AZ#");            //this is absolutely necessary, even with catch block. If the two Tx statements are 
                         //not included the code hangs at the line below 'string response = pkcompass.ReceiveTerminated("#"); may need to ask ASCOM guys
                     }
