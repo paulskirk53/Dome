@@ -474,7 +474,7 @@ namespace ASCOM.GowerCDome
                 double CurrentAzimuth = Azimuth;     // note Azimuth is a dome property - see code for it.
                
  
-                if (Math.Abs(CurrentAzimuth  - ParkAzimuth) <= 1.0)                      
+                if (Math.Abs(CurrentAzimuth  - ParkAzimuth) <= 5.0)                      
                     return true;
                 else
                     return false;
@@ -639,41 +639,11 @@ namespace ASCOM.GowerCDome
 
         public void SetPark()
         {
-            //mycode
-            //get the current azimuth 1st
-            try                          // new Dec 19
-            {
-                pkcompass.ClearBuffers();
-                pkcompass.Transmit("AZ#");
-            }
-            catch (Exception ex)
-            {
-                pkcompass.ClearBuffers();
-                pkcompass.Transmit("AZ#");
-                tl.LogMessage("SetPark failure to Tx AZ#", ex.ToString()); 
-            }
+            
+            //get the current azimuth
 
-            try
-            {
-                string response = pkcompass.ReceiveTerminated("#");
-                response = response.Replace("#", "");
-                double az = 0.0;
-                double.TryParse(response, out az);
-                
-                ParkAzimuth = az;                
-            }
-
-            catch (Exception ex)
-            {
-                tl.LogMessage("Receiving Azimuth fail in SetPark", ex.ToString()); ;
-                ParkAzimuth = 261.0;                            // scope west by default 
-            }
+            ParkAzimuth = Azimuth;               
  
-
-       
-            //endmycode
-
-
             tl.LogMessage("SetPark", " implemented");
            // throw new ASCOM.MethodNotImplementedException("SetPark");
         }
