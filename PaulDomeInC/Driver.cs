@@ -310,74 +310,7 @@ namespace ASCOM.GowerCDome
         // end helper methods
 
 
-        public bool pkversion_of_Connected   // my version before advice from ASCOM Talk - this property is unused now - just kept as a record of the old code
-        {
-            get
-            {
-                tl.LogMessage("Connected Get", IsConnected.ToString());
-                return IsConnected;
-            }
-
-            // ascom connected property extract:
-            // Set True to connect to the device hardware. Set False to disconnect from the device hardware. 
-            // You can also read the property to check whether it is connected. This reports the current hardware state. 
-
-
-// if device.connected is set to true (i.e. value = true) by the calling device, 'set' connects the hardware if it needs connecting
-
-            set
-            {
-                tl.LogMessage("Connected Set", value.ToString());
-                if ((value == true) && (IsConnected == true))         //  a request to connect has been sent but the connection is already established
-                {
-                    return;  // nothing to do
-                }
-
-
-                if ((value == false) && (IsConnected == false))       //  a request to disonnect has been sent but there is no connection.
-                {
-                    return;  // nothing to do
-                }
-                
-                if ((value==true) && (IsConnected == false))         // a request to onnect has been sent and the connection is not yet made
-                {
-                    //set the stepper motor connection
-                    tl.LogMessage("Connected Set", "Connecting to port " + comPort);
-                    pkstepper = new ASCOM.Utilities.Serial();
-                    pkstepper.Port = Convert.ToInt16(StepperComPort.Replace("COM", ""));
-                    
-                    pkstepper.DTREnable = false;
-                    pkstepper.RTSEnable = false;
-                    pkstepper.ReceiveTimeout = 10000;
-
-                    pkstepper.Speed = SerialSpeed.ps115200;            
-                    pkstepper.Connected = true;
-                    pkstepper.ClearBuffers();
-
-                    // set the compass (now encoder) connection
-                    
-                    pkcompass = new ASCOM.Utilities.Serial();
-                    pkcompass.Port = Convert.ToInt16(CompassComPort.Replace("COM", ""));      
-                    pkcompass.DTREnable = false;
-                    pkcompass.RTSEnable = false;
-                    pkcompass.ReceiveTimeout = 10000;
-
-                    pkcompass.Speed = SerialSpeed.ps115200;  // todo check with arduino board
-                    pkcompass.Connected = true;
-                    pkcompass.ClearBuffers();
-                }
-                
-                if ((value == false) && (IsConnected == true))    // a request to disconnet has been made and the connection is currently established
-                {
-                    // disconnect the hardware
-                    pkstepper.Connected = false;
-                    pkcompass.Connected = false;
-                    
-                    //           tl.LogMessage("Connected Set", "Disconnecting from port " + comPort);
-                    
-                }
-            }
-        }
+      
 
         public string Description
         {
@@ -437,7 +370,7 @@ namespace ASCOM.GowerCDome
 
         #region IDome Implementation
 
-        private bool domeShutterState = false; // Variable to hold the open/closed status of the shutter, true = Open
+       // private bool domeShutterState = false; // Variable to hold the open/closed status of the shutter, true = Open
        // public double ParkAzimuth;    //var for holding Setpark position PK mimic of above to try to help with park method.
         
         public void AbortSlew()
@@ -499,7 +432,6 @@ namespace ASCOM.GowerCDome
                     try
                     {
                         pkcompass.ClearBuffers();
-                        pkcompass.Transmit("xx#");
                         pkcompass.Transmit("AZ#");            //this is absolutely necessary, even with catch block. If the two Tx statements are 
                         //not included the code hangs at the line below 'string response = pkcompass.ReceiveTerminated("#"); may need to ask ASCOM guys
                     }
@@ -605,12 +537,12 @@ namespace ASCOM.GowerCDome
         public void CloseShutter()                                           // 13-4-17
         {
 
-            pkstepper.ClearBuffers();
-            pkstepper.Transmit("CS#");
+            pkcompass.ClearBuffers();
+            pkcompass.Transmit("CS#");
             
 
             tl.LogMessage("CloseShutter", "Shutter has been closed");
-            domeShutterState = false;
+           // domeShutterState = false;
         }
 
         public void FindHome()
@@ -621,12 +553,12 @@ namespace ASCOM.GowerCDome
 
         public void OpenShutter()                                          // 13-4-17
         {
-            pkstepper.ClearBuffers();
-            pkstepper.Transmit("OS#");
+            pkcompass.ClearBuffers();
+            pkcompass.Transmit("OS#");
             
 
             tl.LogMessage("OpenShutter", "Shutter has been opened");
-            domeShutterState = true;
+          //  domeShutterState = true;
         }
 
         public void Park()
@@ -652,19 +584,31 @@ namespace ASCOM.GowerCDome
         {
             get
             {
-              
+                //thoughts 
+                /*
+                 
+   - Will need to ensure the arduinos do not set the status line to open or closed before the operation is complete
+   - Also check by setting up a new ASCOM c# dome template that domeshutterstate is used - i think it's somehing i have incorporated unnecessarily.             
+   This section is get which should return ShutterStatus as ShutterState.shutterOpen or  ShutterState.shutterClosed by referencing the command processor
+   status line. A client will presumably keep calling get to check. ASCOM client sample code in device access:
+   */
 
                 tl.LogMessage("ShutterStatus Get", false.ToString());
-                if (domeShutterState)
+                pkcompass.ClearBuffers();
+                pkcompass.Transmit("SS#");                            // send the command to trigger the status response from the arduino
+
+                string state = pkcompass.ReceiveTerminated("#");
+                state = state.Replace("#", "");
+
+                if (state == "OPEN")
                 {
-                    tl.LogMessage("ShutterStatus", ShutterState.shutterOpen.ToString());
                     return ShutterState.shutterOpen;
                 }
                 else
                 {
-                    tl.LogMessage("ShutterStatus", ShutterState.shutterClosed.ToString());
                     return ShutterState.shutterClosed;
                 }
+                     
             }
         }
 
