@@ -681,67 +681,67 @@ namespace ASCOM.GowerCDome
             // and comparing it to the target azimuth, then commands the slew and the direction
 
             // get current Az
-            int DiffMod, difference, part1, part2, part3;   //these are all local and used to claculate modulus in a particular way - not like the c# % function
+   //         int DiffMod, difference, part1, part2, part3;   //these are all local and used to claculate modulus in a particular way - not like the c# % function
 
-            double CurrentAzimuth =  Azimuth ;  //this gets the current azimuth from the dome.Azimuth property  (see your code in Azimuth)
+   //         double CurrentAzimuth =  Azimuth ;  //this gets the current azimuth from the dome.Azimuth property  (see your code in Azimuth)
 
 
-                difference = (int)(CurrentAzimuth-TargetAzimuth );
-                part1 = (int)(difference / 360);
-                if (difference < 0)
-                {
-                    part1 = -1;
-                }
-                part2 = part1 * 360;
-                part3 = difference - part2;
-                DiffMod = part3;
+    //            difference = (int)(CurrentAzimuth-TargetAzimuth );
+  //              part1 = (int)(difference / 360);
+   //             if (difference < 0)
+  //              {
+   //                 part1 = -1;
+     //           }
+     //           part2 = part1 * 360;
+    //            part3 = difference - part2;
+    //            DiffMod = part3;
 
                 
 
                 // code below optimises movement to take the shortest distance
 
          
-                if (DiffMod >= 180)
-                {
+    //            if (DiffMod >= 180)
+    //            {
                 try
                 {
                     pkstepper.ClearBuffers();
-                    pkstepper.Transmit("CL" + CurrentAzimuth.ToString("0.##") + "#");
+     //               pkstepper.Transmit("CL" + CurrentAzimuth.ToString("0.##") + "#");
                     pkstepper.Transmit("SA" + TargetAzimuth.ToString("0.##") + "#");
                 }
                 catch (Exception ex)
                 {
 
                     pkstepper.ClearBuffers();
-                    pkstepper.Transmit("CL" + CurrentAzimuth.ToString("0.##") + "#");
+       //             pkstepper.Transmit("CL" + CurrentAzimuth.ToString("0.##") + "#");
                     pkstepper.Transmit("SA" + TargetAzimuth.ToString("0.##") + "#");
                     // log
                     tl.LogMessage("Slew to azimuth - attempt to send CL and SA for angle > 180", ex.ToString());
                 }
                  
-                }
+      //          }
 
-                else   // the less than 180 scenario
+      //          else   // the less than 180 scenario
 
-                {
+           //     {
 
-                try
-                {
-                    pkstepper.ClearBuffers();
-                    pkstepper.Transmit("CC" + CurrentAzimuth.ToString("0.##") + "#");
-                    pkstepper.Transmit("SA" + TargetAzimuth.ToString("0.##") + "#");
-                }
-                catch (Exception ex)
-                {
+        //        try
+            //    {
+              //      pkstepper.ClearBuffers();
+     //               pkstepper.Transmit("CC" + CurrentAzimuth.ToString("0.##") + "#");
+             //       pkstepper.Transmit("SA" + TargetAzimuth.ToString("0.##") + "#");
+            //    }
+           //     catch (Exception ex)
+           //     {
 
-                    pkstepper.ClearBuffers();
-                    pkstepper.Transmit("CC" + CurrentAzimuth.ToString("0.##") + "#");
-                    pkstepper.Transmit("SA" + TargetAzimuth.ToString("0.##") + "#");
+           //         pkstepper.ClearBuffers();
+     //               pkstepper.Transmit("CC" + CurrentAzimuth.ToString("0.##") + "#");
+           //         pkstepper.Transmit("SA" + TargetAzimuth.ToString("0.##") + "#");
                     //log
-                    tl.LogMessage("Slew to azimuth - attempt to send CL and SA for angle < 180", ex.ToString());
-                }
+            //        tl.LogMessage("Slew to azimuth - attempt to send CL and SA for angle < 180", ex.ToString());
+            //    }
 
-                }
+         //       }
                            
         }
 
@@ -758,13 +758,14 @@ namespace ASCOM.GowerCDome
                 try
                 {
                     pkstepper.ClearBuffers();                                         // this cured the receive problem from Arduino             
-                    pkstepper.Transmit("SL" + CurrentAzimuth.ToString("0.##") + "#"); // changed from just sending SL, to this new pattern
-                                                                                      // which accommodates the SL process in the stepper arduino
+    //            pkstepper.Transmit("SL" + CurrentAzimuth.ToString("0.##") + "#"); // changed from just sending SL, to this new pattern
+                    pkstepper.Transmit("SL#");                 //  accommodates the SL process in the stepper arduino
                 }
                 catch (Exception ex)
                 {
-                    pkstepper.ClearBuffers();                                         
-                    pkstepper.Transmit("SL" + CurrentAzimuth.ToString("0.##") + "#");
+                    pkstepper.ClearBuffers();
+                    //               pkstepper.Transmit("SL" + CurrentAzimuth.ToString("0.##") + "#");
+                    pkstepper.Transmit("SL#");
                     // log failure
                     tl.LogMessage("Slewing Get failed to Tx SL#", ex.ToString());
                 }
