@@ -432,8 +432,8 @@ namespace ASCOM.GowerCDome
                     try
                     {
                         pkcompass.ClearBuffers();
-                        pkcompass.Transmit("AZ#");            //this is absolutely necessary, even with catch block. If the two Tx statements are 
-                        //not included the code hangs at the line below 'string response = pkcompass.ReceiveTerminated("#"); may need to ask ASCOM guys
+                        pkcompass.Transmit("AZ#");       
+                      
                     }
                     catch (Exception ex)
                     {
@@ -677,71 +677,23 @@ namespace ASCOM.GowerCDome
             // throw new ASCOM.MethodNotImplementedException("SlewToAzimuth");
 
 
-            // this method works out which direction to slew by acquiring the current dome azimuth
-            // and comparing it to the target azimuth, then commands the slew and the direction
-
-            // get current Az
-   //         int DiffMod, difference, part1, part2, part3;   //these are all local and used to claculate modulus in a particular way - not like the c# % function
-
-   //         double CurrentAzimuth =  Azimuth ;  //this gets the current azimuth from the dome.Azimuth property  (see your code in Azimuth)
-
-
-    //            difference = (int)(CurrentAzimuth-TargetAzimuth );
-  //              part1 = (int)(difference / 360);
-   //             if (difference < 0)
-  //              {
-   //                 part1 = -1;
-     //           }
-     //           part2 = part1 * 360;
-    //            part3 = difference - part2;
-    //            DiffMod = part3;
-
-                
-
-                // code below optimises movement to take the shortest distance
-
-         
-    //            if (DiffMod >= 180)
-    //            {
+ 
                 try
                 {
                     pkstepper.ClearBuffers();
-     //               pkstepper.Transmit("CL" + CurrentAzimuth.ToString("0.##") + "#");
+    
                     pkstepper.Transmit("SA" + TargetAzimuth.ToString("0.##") + "#");
                 }
                 catch (Exception ex)
                 {
 
                     pkstepper.ClearBuffers();
-       //             pkstepper.Transmit("CL" + CurrentAzimuth.ToString("0.##") + "#");
+    
                     pkstepper.Transmit("SA" + TargetAzimuth.ToString("0.##") + "#");
                     // log
                     tl.LogMessage("Slew to azimuth - attempt to send CL and SA for angle > 180", ex.ToString());
                 }
                  
-      //          }
-
-      //          else   // the less than 180 scenario
-
-           //     {
-
-        //        try
-            //    {
-              //      pkstepper.ClearBuffers();
-     //               pkstepper.Transmit("CC" + CurrentAzimuth.ToString("0.##") + "#");
-             //       pkstepper.Transmit("SA" + TargetAzimuth.ToString("0.##") + "#");
-            //    }
-           //     catch (Exception ex)
-           //     {
-
-           //         pkstepper.ClearBuffers();
-     //               pkstepper.Transmit("CC" + CurrentAzimuth.ToString("0.##") + "#");
-           //         pkstepper.Transmit("SA" + TargetAzimuth.ToString("0.##") + "#");
-                    //log
-            //        tl.LogMessage("Slew to azimuth - attempt to send CL and SA for angle < 180", ex.ToString());
-            //    }
-
-         //       }
                            
         }
 
@@ -750,21 +702,17 @@ namespace ASCOM.GowerCDome
             get
             {
 
-                double CurrentAzimuth = Azimuth;    // new on 20-12-19 see comment immediately below
-
-                // the comment out below was because of the realisation that there is a propety built into the driver which provides the Azimuth
-                //so no need to Tx and Rx to get the current Azimuth
-
+            
                 try
                 {
                     pkstepper.ClearBuffers();                                         // this cured the receive problem from Arduino             
-    //            pkstepper.Transmit("SL" + CurrentAzimuth.ToString("0.##") + "#"); // changed from just sending SL, to this new pattern
+ 
                     pkstepper.Transmit("SL#");                 //  accommodates the SL process in the stepper arduino
                 }
                 catch (Exception ex)
                 {
                     pkstepper.ClearBuffers();
-                    //               pkstepper.Transmit("SL" + CurrentAzimuth.ToString("0.##") + "#");
+        
                     pkstepper.Transmit("SL#");
                     // log failure
                     tl.LogMessage("Slewing Get failed to Tx SL#", ex.ToString());
