@@ -283,7 +283,7 @@ namespace ASCOM.GowerCDome
             port.RTSEnable = false;
             port.ReceiveTimeout = 10000;
             
-            port.Speed = SerialSpeed.ps115200;
+            port.Speed = SerialSpeed.ps19200;
             port.Connected = true;
             port.ClearBuffers();
 
@@ -635,16 +635,7 @@ namespace ASCOM.GowerCDome
 
                     */
 
-
             }
-
-
-
-
-
-
-
-
 
 
         }
@@ -700,9 +691,7 @@ namespace ASCOM.GowerCDome
         public bool Slewing
         {
             get
-            {
-
-            
+            {         
                 try
                 {
                     pkstepper.ClearBuffers();                                         // this cured the receive problem from Arduino             
