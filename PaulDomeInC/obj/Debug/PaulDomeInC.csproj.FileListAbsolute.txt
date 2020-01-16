@@ -18,7 +18,6 @@ C:\Dome Driver GIT Repository\Dome\PaulDomeInC\bin\Debug\ASCOM.Exceptions.xml
 C:\Dome Driver GIT Repository\Dome\PaulDomeInC\bin\Debug\ASCOM.SettingsProvider.xml
 C:\Dome Driver GIT Repository\Dome\PaulDomeInC\bin\Debug\ASCOM.Utilities.xml
 C:\Dome Driver GIT Repository\Dome\PaulDomeInC\bin\Debug\ASCOM.Internal.Extensions.xml
-C:\Dome Driver GIT Repository\Dome\PaulDomeInC\obj\Debug\PaulDomeInC.csprojResolveAssemblyReference.cache
 C:\Dome Driver GIT Repository\Dome\PaulDomeInC\obj\Debug\ASCOM.GowerCDome.GowerDome_interface.resources
 C:\Dome Driver GIT Repository\Dome\PaulDomeInC\obj\Debug\ASCOM.GowerCDome.Properties.Resources.resources
 C:\Dome Driver GIT Repository\Dome\PaulDomeInC\obj\Debug\ASCOM.GowerCDome.SetupDialogForm.resources

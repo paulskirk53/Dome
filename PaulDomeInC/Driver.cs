@@ -432,8 +432,9 @@ namespace ASCOM.GowerCDome
                     try
                     {
                         pkcompass.ClearBuffers();
-                        pkcompass.Transmit("AZ#");       
-                      
+                 //       pkcompass.Transmit("AZ#");     //NEW 14-1-20
+                        pkcompass.Transmit("AZ#");
+
                     }
                     catch (Exception ex)
                     {
@@ -474,7 +475,7 @@ namespace ASCOM.GowerCDome
             {
                 tl.LogMessage("CanPark Get", false.ToString());
 
-                return true;
+                  return true;
             }
         }
 

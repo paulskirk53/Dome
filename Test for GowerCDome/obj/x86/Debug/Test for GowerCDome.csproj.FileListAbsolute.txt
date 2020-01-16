@@ -11,4 +11,3 @@ C:\Dome Driver GIT Repository\Dome\Test for GowerCDome\bin\Debug\ASCOM.Utilities
 C:\Dome Driver GIT Repository\Dome\Test for GowerCDome\bin\Debug\ASCOM.Exceptions.xml
 C:\Dome Driver GIT Repository\Dome\Test for GowerCDome\obj\x86\Debug\ASCOM.GowerCDome.Test.exe
 C:\Dome Driver GIT Repository\Dome\Test for GowerCDome\obj\x86\Debug\ASCOM.GowerCDome.Test.pdb
-C:\Dome Driver GIT Repository\Dome\Test for GowerCDome\obj\x86\Debug\Test for GowerCDome.csprojResolveAssemblyReference.cache
