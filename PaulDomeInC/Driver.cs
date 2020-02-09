@@ -601,18 +601,37 @@ namespace ASCOM.GowerCDome
                 string state = pkcompass.ReceiveTerminated("#");
                 state = state.Replace("#", "");
 
+                switch(state)
+                {
+
+                    case "OPEN":
+
+                        return ShutterState.shutterOpen;
+
+                    case "opening":
+                        return ShutterState.shutterOpening;
+
+                    case "CLOSED":
+                        return ShutterState.shutterClosed;
+
+                    case "closing":
+                        return ShutterState.shutterClosing;
+                    default:
+                        return ShutterState.shutterClosed;
+                }
+/*
                 if (state == "OPEN")
                 {
                     return ShutterState.shutterOpen;
                 }
-                else
+                if (state == "CLOSED")
                 {
                     return ShutterState.shutterClosed;
                   
                 }
 
                 //perhaps use this when the four options are available (open epening etc)
-                /*
+                
                 
                                 switch (state)
                                 {
