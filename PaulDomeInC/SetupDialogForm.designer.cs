@@ -39,6 +39,8 @@ namespace ASCOM.GowerCDome
             this.comboBoxComPortStepper = new System.Windows.Forms.ComboBox();
             this.numericUpDownParkAzimuth = new System.Windows.Forms.NumericUpDown();
             this.lblparkazimuth = new System.Windows.Forms.Label();
+            this.lblshutter = new System.Windows.Forms.Label();
+            this.comboBoxComPortShutter = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownParkAzimuth)).BeginInit();
             this.SuspendLayout();
@@ -92,7 +94,7 @@ namespace ASCOM.GowerCDome
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 93);
+            this.label2.Location = new System.Drawing.Point(16, 93);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(119, 13);
             this.label2.TabIndex = 5;
@@ -170,11 +172,30 @@ namespace ASCOM.GowerCDome
             this.lblparkazimuth.Text = "ParkAzimuth";
             this.lblparkazimuth.Visible = false;
             // 
+            // lblshutter
+            // 
+            this.lblshutter.AutoSize = true;
+            this.lblshutter.Location = new System.Drawing.Point(16, 119);
+            this.lblshutter.Name = "lblshutter";
+            this.lblshutter.Size = new System.Drawing.Size(110, 13);
+            this.lblshutter.TabIndex = 12;
+            this.lblshutter.Text = "Comm Port for Shutter";
+            // 
+            // comboBoxComPortShutter
+            // 
+            this.comboBoxComPortShutter.FormattingEnabled = true;
+            this.comboBoxComPortShutter.Location = new System.Drawing.Point(169, 115);
+            this.comboBoxComPortShutter.Name = "comboBoxComPortShutter";
+            this.comboBoxComPortShutter.Size = new System.Drawing.Size(88, 21);
+            this.comboBoxComPortShutter.TabIndex = 13;
+            // 
             // SetupDialogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(416, 270);
+            this.Controls.Add(this.comboBoxComPortShutter);
+            this.Controls.Add(this.lblshutter);
             this.Controls.Add(this.lblparkazimuth);
             this.Controls.Add(this.numericUpDownParkAzimuth);
             this.Controls.Add(this.comboBoxComPortStepper);
@@ -214,5 +235,7 @@ namespace ASCOM.GowerCDome
         private System.Windows.Forms.ComboBox comboBoxComPortStepper;
         private System.Windows.Forms.NumericUpDown numericUpDownParkAzimuth;
         private System.Windows.Forms.Label lblparkazimuth;
+        private System.Windows.Forms.Label lblshutter;
+        private System.Windows.Forms.ComboBox comboBoxComPortShutter;
     }
 }

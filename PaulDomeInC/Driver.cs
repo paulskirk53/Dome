@@ -79,6 +79,7 @@ namespace ASCOM.GowerCDome
         internal static string comPortProfileName            = "COM Port"; // Constants used for Profile persistence
         internal static string StepperPortProfileName        = "Stepper Port";
         internal static string CompassEncoderPortProfileName = "Encoder Port";
+        internal static string ShutterPortProfileName        = "Shutter Port";
         internal static string SetParkProfilename            = "Set Park";
         internal static string comPortDefault                = "COM4";
         internal static string traceStateProfileName         = "Trace Level";
@@ -86,6 +87,7 @@ namespace ASCOM.GowerCDome
         internal static string comPort;                  // Variables to hold the currrent device configuration
         internal static string CompassComPort;          // PK ADDED THESE ...
         internal static string StepperComPort;
+        internal static string ShutterComPort;
         internal static string Parkplace;
         internal static double ParkAzimuth;
         /// <summary>
@@ -111,6 +113,7 @@ namespace ASCOM.GowerCDome
 
         private ASCOM.Utilities.Serial pkstepper;
         private ASCOM.Utilities.Serial pkcompass;
+        private ASCOM.Utilities.Serial pkShutter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GowerCDome"/> class.
@@ -253,6 +256,8 @@ namespace ASCOM.GowerCDome
                 pkstepper = OpenPort(StepperComPort);
                 // set the compass (now encoder) connection
                 pkcompass = OpenPort(CompassComPort);
+                pkShutter = OpenPort(ShutterComPort);
+
                 return true;    //pk added cos of build error not all code paths return a value
             }
             catch (Exception ex)
@@ -267,6 +272,10 @@ namespace ASCOM.GowerCDome
                 if (pkcompass != null)
                 {
                     DisconnectPort(pkcompass);
+                }
+                if (pkShutter != null)
+                {
+                    DisconnectPort(pkShutter);
                 }
                 return false;   //pk added cos of build error not all code paths return a value
                
@@ -295,6 +304,7 @@ namespace ASCOM.GowerCDome
             // disconnect the hardware
             DisconnectPort(pkstepper);
             DisconnectPort(pkcompass);
+            DisconnectPort(pkShutter);
             //           tl.LogMessage("Connected Set", "Disconnecting from port " + comPort);
         }
 
@@ -538,8 +548,8 @@ namespace ASCOM.GowerCDome
         public void CloseShutter()                                           // 13-4-17
         {
 
-            pkcompass.ClearBuffers();
-            pkcompass.Transmit("CS#");
+            pkShutter.ClearBuffers();
+            pkShutter.Transmit("CS#");
             
 
             tl.LogMessage("CloseShutter", "Shutter has been closed");
@@ -554,8 +564,8 @@ namespace ASCOM.GowerCDome
 
         public void OpenShutter()                                          // 13-4-17
         {
-            pkcompass.ClearBuffers();
-            pkcompass.Transmit("OS#");
+            pkShutter.ClearBuffers();
+            pkShutter.Transmit("OS#");
             
 
             tl.LogMessage("OpenShutter", "Shutter has been opened");
@@ -595,10 +605,10 @@ namespace ASCOM.GowerCDome
    */
 
                 tl.LogMessage("ShutterStatus Get", false.ToString());
-                pkcompass.ClearBuffers();
-                pkcompass.Transmit("SS#");                            // send the command to trigger the status response from the arduino
+                pkShutter.ClearBuffers();
+                pkShutter.Transmit("SS#");                            // send the command to trigger the status response from the arduino
 
-                string state = pkcompass.ReceiveTerminated("#");
+                string state = pkShutter.ReceiveTerminated("#");
                 state = state.Replace("#", "");
 
                 switch(state)
@@ -862,6 +872,7 @@ namespace ASCOM.GowerCDome
 
                 CompassComPort = driverProfile.GetValue(driverID, CompassEncoderPortProfileName, string.Empty, CompassComPort);
                 StepperComPort = driverProfile.GetValue(driverID, StepperPortProfileName, string.Empty, StepperComPort);
+                ShutterComPort = driverProfile.GetValue(driverID, ShutterPortProfileName, string.Empty, ShutterComPort);
                 temp =  driverProfile.GetValue(driverID, SetParkProfilename, Parkplace);
                 double.TryParse(temp, out ParkAzimuth);   // this line sets the initial value of ParkAzimuth
                
@@ -880,6 +891,7 @@ namespace ASCOM.GowerCDome
                 
                 driverProfile.WriteValue(driverID, StepperPortProfileName, StepperComPort.ToString());
                 driverProfile.WriteValue(driverID, CompassEncoderPortProfileName, CompassComPort.ToString());
+                driverProfile.WriteValue(driverID, ShutterPortProfileName, ShutterComPort.ToString());
                 driverProfile.WriteValue(driverID, SetParkProfilename, Parkplace.ToString());
             }
         }
