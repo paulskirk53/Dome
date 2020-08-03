@@ -540,8 +540,8 @@ namespace ASCOM.GowerCDome
         {
             get
             {
-                tl.LogMessage("CanSyncAzimuth Get", false.ToString());
-                return false;
+                tl.LogMessage("CanSyncAzimuth Get", true.ToString());
+                return true;
             }
         }
 
@@ -752,8 +752,10 @@ namespace ASCOM.GowerCDome
 
         public void SyncToAzimuth(double Azimuth)
         {
-            tl.LogMessage("SyncToAzimuth", "Not implemented");
-            throw new ASCOM.MethodNotImplementedException("SyncToAzimuth");
+            tl.LogMessage("SyncToAzimuth", "Now implemented");
+            //throw new ASCOM.MethodNotImplementedException("SyncToAzimuth");
+            String AzimuthString = Azimuth.ToString("0.##");
+            pkcompass.Transmit("STA" + AzimuthString +"#");
         }
 
         #endregion
