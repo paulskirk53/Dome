@@ -254,6 +254,12 @@ namespace ASCOM.GowerCDome
             try
             {
                 pkstepper = OpenPort(StepperComPort);
+
+                //the stepper needs to be initialised on connection to avoid failure linked to a previous goto when a system wide
+                //restart of equipment is required.
+
+                initialise_stepper();
+
                 // set the compass (now encoder) connection
                 pkcompass = OpenPort(CompassComPort);
                 pkShutter = OpenPort(ShutterComPort);
@@ -282,6 +288,28 @@ namespace ASCOM.GowerCDome
             }
             
            
+        }
+
+        private void initialise_stepper()
+        {
+            double AzimuthInitialise = 261.00;
+
+            try
+            {
+                pkstepper.ClearBuffers();
+
+                pkstepper.Transmit("SA" + AzimuthInitialise.ToString("0.##") + "#");
+            }
+            catch (Exception ex)
+            {
+
+                pkstepper.ClearBuffers();
+
+                pkstepper.Transmit("SA" + AzimuthInitialise.ToString("0.##") + "#");
+                // log
+                tl.LogMessage("Attempt to initialise azimuth for the stepper", ex.ToString());
+            }
+
         }
 
         private ASCOM.Utilities.Serial OpenPort(string portName)
