@@ -28,6 +28,7 @@ namespace ASCOM.GowerCDome
             Dome.tl.Enabled = chkTrace.Checked; 
             Dome.CompassComPort = (string)comboBoxComPort.SelectedItem;          //user selected port for compass
             Dome.StepperComPort = (string)comboBoxComPortStepper.SelectedItem;   //user selected port for stepper
+            Dome.ShutterComPort = (string)comboBoxComPortShutter.SelectedItem;   //user selected port for stepper
             Dome.Parkplace = numericUpDownParkAzimuth.Value.ToString();
             //System.Windows.Forms.MessageBox.Show(Dome.StepperComPort);            // put in to test -pops up a dialog showing value of comport selected
 
@@ -71,8 +72,10 @@ namespace ASCOM.GowerCDome
             // set the list of com ports to those that are currently available
             comboBoxComPort.Items.Clear();        //compass
             comboBoxComPortStepper.Items.Clear(); //pk code
-            comboBoxComPort.Items.AddRange(System.IO.Ports.SerialPort.GetPortNames());      // use System.IO because it's static
-            comboBoxComPortStepper.Items.AddRange(System.IO.Ports.SerialPort.GetPortNames());  // pk code
+            comboBoxComPortShutter.Items.Clear(); //pk code
+            comboBoxComPort.Items.AddRange(System.IO.Ports.SerialPort.GetPortNames());             // use System.IO because it's static
+            comboBoxComPortShutter.Items.AddRange(System.IO.Ports.SerialPort.GetPortNames());      // use System.IO because it's static
+            comboBoxComPortStepper.Items.AddRange(System.IO.Ports.SerialPort.GetPortNames());      // pk code
             // select the current port if possible
             if (comboBoxComPort.Items.Contains(Dome.CompassComPort))   // see the driver code - this is set to a value of 4 - i.e. com4 is default
             {
@@ -84,8 +87,12 @@ namespace ASCOM.GowerCDome
             {
                 comboBoxComPortStepper.SelectedItem = Dome.StepperComPort;    // the item that appears in the combobox at form load
             }
+            if (comboBoxComPortShutter.Items.Contains(Dome.ShutterComPort))   // see the driver code - this is set in the connected proerty
+            {
+                comboBoxComPortShutter.SelectedItem = Dome.ShutterComPort;    // the item that appears in the combobox at form load
+            }
             //end new
-            
+
             // the following line works to get the value from the ascom profile store into the numeric updown field on the setup dialog
             numericUpDownParkAzimuth.Value = (decimal)Dome.ParkAzimuth;  // ParkAzimuth comes from the driver ReadProfile()
         }

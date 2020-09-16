@@ -6,14 +6,7 @@
 //
 // Description:	Part one - THIS IS THE WORKING PROJECT FILE. iT has been tested initially with POTH 
 //				and a planetarium programme cartes du ciel. Also with SGP
-//				Needs a lot more testing and also setting a park position if required and
-//				registering it all i.e. compass due south and slit same?????
 //
-//				Part two - on 2-1-18 I added this solution to subversion (visualSvn -> add solution to subversion)
-//              The changes here reflect the need to separate the two arduino boards - one for compass
-//              and one for the steppers.
-//              The solution for two boards is in development as of this adition to SVN
-//              the previous version stored at paul/domeinc/ remains, but works with one arduino board
 //      Code for this revision is informd by 'dome driver program process - google sheets url
 //      https://docs.google.com/spreadsheets/d/129XTTVrI_Kxw_0QjSZ3ILjBEWEoGZlBaUu5U1P22TgM/edit#gid=0
 //
@@ -22,16 +15,12 @@
 // Author:		(XXX) Paul Kirk <your@email.here>, base code by Tom How, Curdridge Observatory
 //
 // Edit Log:
-// accessed just for reminder purposes 16-9-17
-// 4-3-17 populated connected, isconnected and azimuth
-// tested to print out dome azimuth from Arduino sketch
 //
 // Date			Who	Vers	Description
 // -----------	---	-----	-------------------------------------------------------
 // 4-3-2017	XXX	6.0.0	Initial edit, created from ASCOM driver template
 // --------------------------------------------------------------------------------
-// 14-8-17 just getting back into this - no changes just reviewing. It looks like the latest version 
-// with 'can' properties set appropriately
+
 // 14-8-17 tested with telescope sim for.net, POTH and C du Ciel - see notes in wordpad file  in folder 'domestuff'
 // stepper moves as expected when tracking and doing gotos in this simulator environment
 
@@ -86,20 +75,19 @@ namespace ASCOM.GowerCDome
         /// <summary>
         /// Driver description that displays in the ASCOM Chooser.
         /// </summary>
-        private static string driverDescription = "ASCOM Gower Observatory 2017.";
-
-        internal static string comPortProfileName = "COM Port"; // Constants used for Profile persistence
-        internal static string StepperPortProfileName = "Stepper Port";
+        private static string driverDescription              = "ASCOM Gower Observatory 2017.";
+        internal static string comPortProfileName            = "COM Port"; // Constants used for Profile persistence
+        internal static string StepperPortProfileName        = "Stepper Port";
         internal static string CompassEncoderPortProfileName = "Encoder Port";
-        internal static string SetParkProfilename = "Set Park";
-        internal static string comPortDefault = "COM4";
-
-        internal static string traceStateProfileName = "Trace Level";
-        internal static string traceStateDefault = "false";
-
-        internal static string comPort; // Variables to hold the currrent device configuration
-        internal static string CompassComPort= "COM12";  // PK ADDED THESE to try to fix POTH connection error
-        internal static string StepperComPort = "COM16";
+        internal static string ShutterPortProfileName        = "Shutter Port";
+        internal static string SetParkProfilename            = "Set Park";
+        internal static string comPortDefault                = "COM4";
+        internal static string traceStateProfileName         = "Trace Level";
+        internal static string traceStateDefault             = "false";
+        internal static string comPort;                  // Variables to hold the currrent device configuration
+        internal static string CompassComPort;          // PK ADDED THESE ...
+        internal static string StepperComPort;
+        internal static string ShutterComPort;
         internal static string Parkplace;
         internal static double ParkAzimuth;
         /// <summary>
@@ -125,6 +113,7 @@ namespace ASCOM.GowerCDome
 
         private ASCOM.Utilities.Serial pkstepper;
         private ASCOM.Utilities.Serial pkcompass;
+        private ASCOM.Utilities.Serial pkShutter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GowerCDome"/> class.
@@ -132,10 +121,6 @@ namespace ASCOM.GowerCDome
         /// </summary>
         public Dome()
         {
-          
-        //    string message = "Debug box";
-        //    string title = "Debug";
-        //    MessageBox.Show(message, title);
            
             tl = new TraceLogger("", "GowerCDome");
             ReadProfile(); // Read device configuration from the ASCOM Profile store
@@ -148,8 +133,7 @@ namespace ASCOM.GowerCDome
             //TODO: Implement your additional construction here
 
             tl.LogMessage("Dome", "Completed initialisation");
-          //   GowerDome_interface f2 = new GowerDome_interface();
-           //  f2.ShowDialog();
+
         }
 
 
@@ -170,8 +154,7 @@ namespace ASCOM.GowerCDome
             // consider only showing the setup dialog if not connected
             // or call a different dialog if connected
             if (IsConnected)
-          //  System.Windows.Forms.MessageBox.Show(Dome.CompassComPort);
-         //   System.Windows.Forms.MessageBox.Show(Dome.StepperComPort);
+          
             System.Windows.Forms.MessageBox.Show("Already connected, just press OK");
 
             using (SetupDialogForm F = new SetupDialogForm())
@@ -246,21 +229,16 @@ namespace ASCOM.GowerCDome
             get { return connectedState; }
             set
             {
-                //tl.LogMessage("Connected Set", value.ToString());
-
-              //  if (value == connectedState) //  no change
-             //   {
-               //     return;  // nothing to do
-               // }
+ 
 
                 if (value)    // Connect requested
                 {
-                    connectedState = Connect();    // was IsConnected = Connect();
+                    connectedState = Connect();    
                 }
                 else    // Disconnect requested
                 {
                     Disconnect();
-                    connectedState = false;  //was IsConnected = Disconnect();
+                    connectedState = false;  
                 }
             }
         }
@@ -271,18 +249,26 @@ namespace ASCOM.GowerCDome
 
         private bool Connect()
         {
-            tl.LogMessage("Connected Set", "Connecting to port " + comPort);
+            tl.LogMessage("Connected Set", "Connecting to port " + StepperComPort );
             //set the stepper motor connection
             try
             {
                 pkstepper = OpenPort(StepperComPort);
+
+                //the stepper needs to be initialised on connection to avoid failure linked to a previous goto when a system wide
+                //restart of equipment is required.
+
+                initialise_stepper();
+
                 // set the compass (now encoder) connection
                 pkcompass = OpenPort(CompassComPort);
+                pkShutter = OpenPort(ShutterComPort);
+
                 return true;    //pk added cos of build error not all code paths return a value
             }
             catch (Exception ex)
             {
-                tl.LogMessage("Connected Set", "Unable to connect to COM ports");
+                tl.LogMessage("Connected Set", "Unable to connect to COM ports " + ex.ToString());
 
                 if (pkstepper != null)
                 {
@@ -293,11 +279,37 @@ namespace ASCOM.GowerCDome
                 {
                     DisconnectPort(pkcompass);
                 }
+                if (pkShutter != null)
+                {
+                    DisconnectPort(pkShutter);
+                }
                 return false;   //pk added cos of build error not all code paths return a value
                
             }
             
            
+        }
+
+        private void initialise_stepper()
+        {
+            double AzimuthInitialise = 261.00;
+
+            try
+            {
+                pkstepper.ClearBuffers();
+
+                pkstepper.Transmit("SA" + AzimuthInitialise.ToString("0.##") + "#");
+            }
+            catch (Exception ex)
+            {
+
+                pkstepper.ClearBuffers();
+
+                pkstepper.Transmit("SA" + AzimuthInitialise.ToString("0.##") + "#");
+                // log
+                tl.LogMessage("Attempt to initialise azimuth for the stepper", ex.ToString());
+            }
+
         }
 
         private ASCOM.Utilities.Serial OpenPort(string portName)
@@ -308,7 +320,7 @@ namespace ASCOM.GowerCDome
             port.RTSEnable = false;
             port.ReceiveTimeout = 10000;
             
-            port.Speed = SerialSpeed.ps115200;
+            port.Speed = SerialSpeed.ps19200;
             port.Connected = true;
             port.ClearBuffers();
 
@@ -320,6 +332,7 @@ namespace ASCOM.GowerCDome
             // disconnect the hardware
             DisconnectPort(pkstepper);
             DisconnectPort(pkcompass);
+            DisconnectPort(pkShutter);
             //           tl.LogMessage("Connected Set", "Disconnecting from port " + comPort);
         }
 
@@ -335,74 +348,7 @@ namespace ASCOM.GowerCDome
         // end helper methods
 
 
-        public bool pkversion_of_Connected   // my version before advice from ASCOM Talk - this property is unused now - just kept as a record of the old code
-        {
-            get
-            {
-                tl.LogMessage("Connected Get", IsConnected.ToString());
-                return IsConnected;
-            }
-
-            // ascom connected property extract:
-            // Set True to connect to the device hardware. Set False to disconnect from the device hardware. 
-            // You can also read the property to check whether it is connected. This reports the current hardware state. 
-
-
-// if device.connected is set to true (i.e. value = true) by the calling device, 'set' connects the hardware if it needs connecting
-
-            set
-            {
-                tl.LogMessage("Connected Set", value.ToString());
-                if ((value == true) && (IsConnected == true))         //  a request to connect has been sent but the connection is already established
-                {
-                    return;  // nothing to do
-                }
-
-
-                if ((value == false) && (IsConnected == false))       //  a request to disonnect has been sent but there is no connection.
-                {
-                    return;  // nothing to do
-                }
-                
-                if ((value==true) && (IsConnected == false))         // a request to onnect has been sent and the connection is not yet made
-                {
-                    //set the stepper motor connection
-                    tl.LogMessage("Connected Set", "Connecting to port " + comPort);
-                    pkstepper = new ASCOM.Utilities.Serial();
-                    pkstepper.Port = Convert.ToInt16(StepperComPort.Replace("COM", ""));
-                    
-                    pkstepper.DTREnable = false;
-                    pkstepper.RTSEnable = false;
-                    pkstepper.ReceiveTimeout = 10000;
-
-                    pkstepper.Speed = SerialSpeed.ps115200;            
-                    pkstepper.Connected = true;
-                    pkstepper.ClearBuffers();
-
-                    // set the compass (now encoder) connection
-                    
-                    pkcompass = new ASCOM.Utilities.Serial();
-                    pkcompass.Port = Convert.ToInt16(CompassComPort.Replace("COM", ""));      
-                    pkcompass.DTREnable = false;
-                    pkcompass.RTSEnable = false;
-                    pkcompass.ReceiveTimeout = 10000;
-
-                    pkcompass.Speed = SerialSpeed.ps115200;  // todo check with arduino board
-                    pkcompass.Connected = true;
-                    pkcompass.ClearBuffers();
-                }
-                
-                if ((value == false) && (IsConnected == true))    // a request to disconnet has been made and the connection is currently established
-                {
-                    // disconnect the hardware
-                    pkstepper.Connected = false;
-                    pkcompass.Connected = false;
-                    
-                    //           tl.LogMessage("Connected Set", "Disconnecting from port " + comPort);
-                    
-                }
-            }
-        }
+      
 
         public string Description
         {
@@ -462,7 +408,7 @@ namespace ASCOM.GowerCDome
 
         #region IDome Implementation
 
-        private bool domeShutterState = false; // Variable to hold the open/closed status of the shutter, true = Open
+       // private bool domeShutterState = false; // Variable to hold the open/closed status of the shutter, true = Open
        // public double ParkAzimuth;    //var for holding Setpark position PK mimic of above to try to help with park method.
         
         public void AbortSlew()
@@ -496,14 +442,10 @@ namespace ASCOM.GowerCDome
             {
                 //mycode
                 // check if the current dome azimuth is = to ParkAzimuth
-                pkcompass.ClearBuffers();
-                pkcompass.Transmit("ZZ#");
-                pkcompass.Transmit("AZ#");
-                string AP_response = pkcompass.ReceiveTerminated("#");
-                AP_response = AP_response.Replace("#", "");                // AP_Response will contain the dome azimuth from the compass.
-               double az = 0.0;
-               double.TryParse(AP_response, out az);
-                if (Math.Abs(az - ParkAzimuth) <= 10.0)                      // does this work correctly on double DT?
+                double CurrentAzimuth = Azimuth;     // note Azimuth is a dome property - see code for it.
+               
+ 
+                if (Math.Abs(CurrentAzimuth  - ParkAzimuth) <= 5.0)                      
                     return true;
                 else
                     return false;
@@ -513,44 +455,47 @@ namespace ASCOM.GowerCDome
             }
         }
 
-        public double Azimuth  // try putting string myresponse and then return myresponse
+        public double Azimuth 
         {
             get
             {
-               // string stringtosend = "AZ#";
-                // bool x = pkcompass.Connected;
-                //   pkcompass.Transmit("SA" + Azimuth.ToString("0.##") + "#");
-                pkcompass.ClearBuffers();
-                //pkcompass.Transmit(stringtosend);
-                // pkcompass.Transmit("ZZ#");
-                try
-                {
-                    pkcompass.Transmit("AZ#");
-                }
-                catch (Exception ex)
-                {
-                    pkcompass.Transmit("AZ#");
-                }
-                finally
-                {
-                    // re transmit
-                    pkcompass.Transmit("AZ#");
-                }
-
-                string response = pkcompass.ReceiveTerminated("#");
-                response = response.Replace("#", "");
+   
+                int trycount = 0;
+                bool success = false;
                 double az = 0;
-                if (double.TryParse(response, out az))
+
+                while (success==false)
                 {
+
+                    try
+                    {
+                        pkcompass.ClearBuffers();
+                 //       pkcompass.Transmit("AZ#");     //NEW 14-1-20
+                        pkcompass.Transmit("AZ#");
+
+                    }
+                    catch (Exception ex)
+                    {
+                        tl.LogMessage("Azimuth property failure to Tx AZ#", ex.ToString());
+                        pkcompass.Transmit("AZ#");
+                    }
+
+
+                    string response = pkcompass.ReceiveTerminated("#");
+                    response = response.Replace("#", "");
+                    
+                    success = double.TryParse(response, out az);
+
+                    trycount++;
+
+                    if (trycount>4)
+                    {
+                        break;
+                    }
+
+                }
                     return az;
-                }
-
-                else
-                {
-                    return 17;
-                }
-
-            }
+              }
         }
 
         public bool CanFindHome
@@ -558,7 +503,7 @@ namespace ASCOM.GowerCDome
             get
             {
                 tl.LogMessage("CanFindHome Get", false.ToString());
-                return false;                                        //PK set these to true if the driver can do them?????
+                return false;                                        
             }
         }
 
@@ -567,9 +512,8 @@ namespace ASCOM.GowerCDome
             get
             {
                 tl.LogMessage("CanPark Get", false.ToString());
-                // return false;
-                // pk changed to return true
-                return true;
+
+                  return true;
             }
         }
 
@@ -597,8 +541,7 @@ namespace ASCOM.GowerCDome
             get
             {
                 tl.LogMessage("CanSetPark Get", false.ToString());
-                //return false;
-                // pk changed to return true
+
                 return true;
             }
         }
@@ -625,20 +568,20 @@ namespace ASCOM.GowerCDome
         {
             get
             {
-                tl.LogMessage("CanSyncAzimuth Get", false.ToString());
-                return false;
+                tl.LogMessage("CanSyncAzimuth Get", true.ToString());
+                return true;
             }
         }
 
         public void CloseShutter()                                           // 13-4-17
         {
 
-            pkstepper.ClearBuffers();
-            pkstepper.Transmit("CS#");
+            pkShutter.ClearBuffers();
+            pkShutter.Transmit("CS#");
             
 
             tl.LogMessage("CloseShutter", "Shutter has been closed");
-            domeShutterState = false;
+           // domeShutterState = false;
         }
 
         public void FindHome()
@@ -649,101 +592,29 @@ namespace ASCOM.GowerCDome
 
         public void OpenShutter()                                          // 13-4-17
         {
-            pkstepper.ClearBuffers();
-            pkstepper.Transmit("OS#");
+            pkShutter.ClearBuffers();
+            pkShutter.Transmit("OS#");
             
 
             tl.LogMessage("OpenShutter", "Shutter has been opened");
-            domeShutterState = true;
+          //  domeShutterState = true;
         }
 
         public void Park()
         {
-            //4-3-19 the old code below is insufficient - the stepper needs CLcurrentaz# followed by SAParkAzimuth# and Sl comands in order to slowdown/ stop
-            // the CL and Sa are in our control but will need to check is SL is issued by the driver for park slews
-            //slew (SA.....#) to park position
-
-            //new code 5-3-19
-
-            // get current Az
-
-            int DiffMod, difference, part1, part2, part3;   //these are all local and used to claculate modulus in a particular way - not like the c# % function
-
-            double CurrentAzimuth = 0.0;
-            pkcompass.ClearBuffers();
-            pkcompass.Transmit("AZ#");
-
-            string response = pkcompass.ReceiveTerminated("#");
-            response = response.Replace("#", "");
-
-            double.TryParse(response, out CurrentAzimuth);
-            //new may31st 19
-
-            //new
-
-            difference = (int)(CurrentAzimuth - ParkAzimuth);
-            part1 = (int)(difference / 360);
-            if (difference < 0)
+            if (!AtPark)                     //if we're already there, do nothing
             {
-                part1 = -1;
+                SlewToAzimuth(ParkAzimuth);
             }
-            part2 = part1 * 360;
-            part3 = difference - part2;
-            DiffMod = part3;
-
-            // end new
-
-            // new code below optimises movement to take the shortest distance
-
-            // this did not work and always ended up slewing in one direction  DiffMod = (int)(Azimuth - CurrentAzimuth) % 360;
-
-            if (DiffMod >= 180)
-            {
-                pkstepper.ClearBuffers();
-                pkstepper.Transmit("CL" + CurrentAzimuth.ToString("0.##") + "#");
-                pkstepper.Transmit("SA" + ParkAzimuth.ToString("0.##") + "#");
-            }
-
-            else   // the less than 180 scenario
-
-            {
-                pkstepper.ClearBuffers();
-                pkstepper.Transmit("CC" + CurrentAzimuth.ToString("0.##") + "#");
-                pkstepper.Transmit("SA" + ParkAzimuth.ToString("0.##") + "#");
-            }
-
-            //end new code 12-2-19
-
-
-
-            // end new 31st May 19  
-
-            
-
-        }
+         }
 
         public void SetPark()
         {
-            //mycode
             
-           // ParkAzimuth = 261.0;                        // west corresponds to scope Az = 270 degrees
+            //get the current azimuth
 
-            //get the current azimuth 1st
-            pkcompass.ClearBuffers();
-            pkcompass.Transmit("AZ#");
-
-            string response = pkcompass.ReceiveTerminated("#");
-            response = response.Replace("#", "");
-            double az = 0.0;
-            if (double.TryParse(response, out az))
-                 ParkAzimuth = az;
-            else
-                ParkAzimuth = 261.0;                            // west by default
-
-       
-            //endmycode
-
-
+            ParkAzimuth = Azimuth;               
+ 
             tl.LogMessage("SetPark", " implemented");
            // throw new ASCOM.MethodNotImplementedException("SetPark");
         }
@@ -752,20 +623,79 @@ namespace ASCOM.GowerCDome
         {
             get
             {
-              
+                //thoughts 
+                /*
+                 
+   - Will need to ensure the arduinos do not set the status line to open or closed before the operation is complete
+   - Also check by setting up a new ASCOM c# dome template that domeshutterstate is used - i think it's somehing i have incorporated unnecessarily.             
+   This section is get which should return ShutterStatus as ShutterState.shutterOpen or  ShutterState.shutterClosed by referencing the command processor
+   status line. A client will presumably keep calling get to check. ASCOM client sample code in device access:
+   */
 
                 tl.LogMessage("ShutterStatus Get", false.ToString());
-                if (domeShutterState)
+                pkShutter.ClearBuffers();
+                pkShutter.Transmit("SS#");                            // send the command to trigger the status response from the arduino
+
+                string state = pkShutter.ReceiveTerminated("#");
+                state = state.Replace("#", "");
+
+                switch(state)
                 {
-                    tl.LogMessage("ShutterStatus", ShutterState.shutterOpen.ToString());
+
+                    case "OPEN":
+
+                        return ShutterState.shutterOpen;
+
+                    case "opening":
+                        return ShutterState.shutterOpening;
+
+                    case "CLOSED":
+                        return ShutterState.shutterClosed;
+
+                    case "closing":
+                        return ShutterState.shutterClosing;
+                    default:
+                        return ShutterState.shutterClosed;
+                }
+/*
+                if (state == "OPEN")
+                {
                     return ShutterState.shutterOpen;
                 }
-                else
+                if (state == "CLOSED")
                 {
-                    tl.LogMessage("ShutterStatus", ShutterState.shutterClosed.ToString());
                     return ShutterState.shutterClosed;
+                  
                 }
+
+                //perhaps use this when the four options are available (open epening etc)
+                
+                
+                                switch (state)
+                                {
+                                    case  "OPEN":
+                                        return ShutterState.shutterOpen;
+                                        break;
+                                    case   "CLOSED":
+                                        return ShutterState.shutterClosed;
+                                        break;
+                                    case   "OPENING":
+                                        return ShutterState.shutterOpening;
+                                        break;
+                                    case   "CLOSING":
+                                        return ShutterState.shutterClosing;
+                                        break;
+
+                                    default:
+
+                                        break;
+                                }
+
+                    */
+
             }
+
+
         }
 
         public bool Slaved
@@ -779,7 +709,7 @@ namespace ASCOM.GowerCDome
             {
                 tl.LogMessage("Slaved Set", "not implemented");
                 throw new ASCOM.PropertyNotImplementedException("Slaved", true);
-                                                                                 //pktodo?  see CanSlave too
+                                                                               
             }
         }
 
@@ -789,119 +719,55 @@ namespace ASCOM.GowerCDome
             throw new ASCOM.MethodNotImplementedException("SlewToAltitude");
         }
 
-        public void SlewToAzimuth(double Azimuth)
+        public void SlewToAzimuth(double TargetAzimuth)
         {
-
-            //31st May 19 took out the if stmt which needed more than 5 degree difference in order to issue the move command.
-            // 
+ 
             tl.LogMessage("SA", "Started to implement");
             // throw new ASCOM.MethodNotImplementedException("SlewToAzimuth");
 
 
-            // this method works out which direction to slew by acquiring the current dome azimuth
-            // and comparing it to the target azimuth, then commands the slew and the direction
-
-            // get current Az
-            int DiffMod, difference, part1, part2, part3;   //these are all local and used to claculate modulus in a particular way - not like the c# % function
-
-            double CurrentAzimuth = 0.0;
-
-            pkcompass.ClearBuffers();
-            pkcompass.Transmit("AZ#");
-            
-
-            string response = pkcompass.ReceiveTerminated("#");
-            response = response.Replace("#", "");
-
-            double.TryParse(response, out CurrentAzimuth);
-         //   if (Math.Abs(Azimuth - CurrentAzimuth) > 1.0)       // if the difference between current az and target az is >1 degrees in Azimuth do some movement
-            //{
-                //new
-
-                difference = (int)(CurrentAzimuth-Azimuth);
-                part1 = (int)(difference / 360);
-                if (difference < 0)
-                {
-                    part1 = -1;
-                }
-                part2 = part1 * 360;
-                part3 = difference - part2;
-                DiffMod = part3;
-
-                // end new
-
-                // new code below optimises movement to take the shortest distance
-
-               // this did not work and always ended up slewing in one direction  DiffMod = (int)(Azimuth - CurrentAzimuth) % 360;
-
-                if (DiffMod >= 180)
+ 
+                try
                 {
                     pkstepper.ClearBuffers();
-                    pkstepper.Transmit("CL" + CurrentAzimuth.ToString("0.##") + "#");
-                    pkstepper.Transmit("SA" + Azimuth.ToString("0.##") + "#");
+    
+                    pkstepper.Transmit("SA" + TargetAzimuth.ToString("0.##") + "#");
                 }
-
-                else   // the less than 180 scenario
-
+                catch (Exception ex)
                 {
+
                     pkstepper.ClearBuffers();
-                    pkstepper.Transmit("CC" + CurrentAzimuth.ToString("0.##") + "#");
-                    pkstepper.Transmit("SA" + Azimuth.ToString("0.##") + "#");
+    
+                    pkstepper.Transmit("SA" + TargetAzimuth.ToString("0.##") + "#");
+                    // log
+                    tl.LogMessage("Slew to azimuth - attempt to send CL and SA for angle > 180", ex.ToString());
                 }
-
-                //end new code 12-2-19
-                
-                
-                /* the old move to azimuth code commented out below 
-                 * 
-                if (Azimuth < CurrentAzimuth)                   // Counterclockwise movement required - check this empirically as motor direction may be incorrect
-                {
-                    pkstepper.ClearBuffers();
-                    //pkstepper.Transmit("CC#");                   removed the current CC# line here and take the opportunity to replace it as below sending the current az as well
-                    pkstepper.Transmit("CC" + CurrentAzimuth.ToString("0.##") + "#");
-
-                    pkstepper.Transmit("SA" + Azimuth.ToString("0.##") + "#");
-                }
-
-                if (Azimuth > CurrentAzimuth)  //clockwise movement required - check this empirically as motor direction may be incorrect
-                {
-                    pkstepper.ClearBuffers();
-                   // pkstepper.Transmit("CL#");                   remove the current CL# line here and take the opportunity to replace it as below sending the current az as well
-                    pkstepper.Transmit("CL" + CurrentAzimuth.ToString("0.##") + "#");
-
-                    pkstepper.Transmit("SA" + Azimuth.ToString("0.##") + "#");
-                    // pkstepper.Transmit(Azimuth.ToString("0.##") + "#");  
-                }
-
-                */
-
-            
+                 
+                           
         }
 
         public bool Slewing
         {
             get
-            {
-                //new code below gets current azimuth from compass and sends it to the SL arduino process
-                pkcompass.ClearBuffers();
-                pkcompass.Transmit("AZ#");
-                
-
-                string response = pkcompass.ReceiveTerminated("#");
-                response = response.Replace("#", "");
-                double CurrentAzimuth = 0.0;
-                double.TryParse(response, out CurrentAzimuth);
-                //end new code   
+            {         
+                try
+                {
+                    pkstepper.ClearBuffers();                                         // this cured the receive problem from Arduino             
+ 
+                    pkstepper.Transmit("SL#");                 //  accommodates the SL process in the stepper arduino
+                }
+                catch (Exception ex)
+                {
+                    pkstepper.ClearBuffers();
         
+                    pkstepper.Transmit("SL#");
+                    // log failure
+                    tl.LogMessage("Slewing Get failed to Tx SL#", ex.ToString());
+                }
 
-                pkstepper.ClearBuffers();                              // this cured the receive problem from Arduino
-                tl.LogMessage("Slewing Get", false.ToString());
-                pkstepper.Transmit("SL" + CurrentAzimuth.ToString("0.##") + "#"); // changed from just sending SL, to this new pattern
-                                                                            // which accommodates the SL process in the stepper arduino
-
-                string SL_response = pkstepper.ReceiveTerminated("#"); // read what's sent back
-                SL_response = SL_response.Replace("#", "");           // remove the # mark
-                if (SL_response == "Moving")                          // set this condition properly
+                string SL_response = pkstepper.ReceiveTerminated("#");            // read what's sent back
+                SL_response = SL_response.Replace("#", "");                       // remove the # mark
+                if (SL_response == "Moving")                                      // set this condition properly
                 {
                     return true;
                 }
@@ -914,8 +780,10 @@ namespace ASCOM.GowerCDome
 
         public void SyncToAzimuth(double Azimuth)
         {
-            tl.LogMessage("SyncToAzimuth", "Not implemented");
-            throw new ASCOM.MethodNotImplementedException("SyncToAzimuth");
+            tl.LogMessage("SyncToAzimuth", "Now implemented");
+            //throw new ASCOM.MethodNotImplementedException("SyncToAzimuth");
+            String AzimuthString = Azimuth.ToString("0.##");
+            pkcompass.Transmit("STA" + AzimuthString +"#");
         }
 
         #endregion
@@ -1006,36 +874,6 @@ namespace ASCOM.GowerCDome
             get
             {
                 return connectedState;
-             
-
-                // my code for this below
-                // 9-3-19 following advice from ASCOM Talk. The Connected property now sets connected state depending upon whether connection is made or unmade, so no need for the code below
-
-                /*
-
-                if ( (pkstepper != null) && (pkcompass != null) )  // IT IS SOMETHING
-                {
-
-                    if ( (pkstepper.Connected)    && (pkcompass.Connected) )           // start block
-                    {
-                         connectedState = true;
-                    }
-                    else
-                    {
-                        connectedState = false;
-                    }                                 // end block incl
-
-                }                                     // endif tue block pkstepper != NULL
-                else
-                {
-                     connectedState = false;
-                }
-              
-                // end mycode
-                
-
-                return connectedState;
-                */
             }
         }
 
@@ -1061,9 +899,10 @@ namespace ASCOM.GowerCDome
             {
                 driverProfile.DeviceType = "Dome";
                 tl.Enabled = Convert.ToBoolean(driverProfile.GetValue(driverID, traceStateProfileName, string.Empty, traceStateDefault));
-                // comPort = driverProfile.GetValue(driverID, comPortProfileName, string.Empty, comPortDefault);
+
                 CompassComPort = driverProfile.GetValue(driverID, CompassEncoderPortProfileName, string.Empty, CompassComPort);
                 StepperComPort = driverProfile.GetValue(driverID, StepperPortProfileName, string.Empty, StepperComPort);
+                ShutterComPort = driverProfile.GetValue(driverID, ShutterPortProfileName, string.Empty, ShutterComPort);
                 temp =  driverProfile.GetValue(driverID, SetParkProfilename, Parkplace);
                 double.TryParse(temp, out ParkAzimuth);   // this line sets the initial value of ParkAzimuth
                
@@ -1082,9 +921,8 @@ namespace ASCOM.GowerCDome
                 
                 driverProfile.WriteValue(driverID, StepperPortProfileName, StepperComPort.ToString());
                 driverProfile.WriteValue(driverID, CompassEncoderPortProfileName, CompassComPort.ToString());
+                driverProfile.WriteValue(driverID, ShutterPortProfileName, ShutterComPort.ToString());
                 driverProfile.WriteValue(driverID, SetParkProfilename, Parkplace.ToString());
-
-                //driverProfile.WriteValue(driverID, StepperComPort, comPort.ToString());
             }
         }
 
