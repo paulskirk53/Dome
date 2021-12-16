@@ -75,7 +75,7 @@ namespace ASCOM.GowerCDome
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(143, 31);
             this.label1.TabIndex = 2;
-            this.label1.Text = "Driver settings for compass and stepper ports.";
+            this.label1.Text = "Driver settings for Azimuth and stepper ports.";
             // 
             // picASCOM
             // 
@@ -96,9 +96,9 @@ namespace ASCOM.GowerCDome
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(16, 93);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(119, 13);
+            this.label2.Size = new System.Drawing.Size(131, 13);
             this.label2.TabIndex = 5;
-            this.label2.Text = "Comm Port for Compass";
+            this.label2.Text = "Comm Port for Az Encoder";
             // 
             // chkTrace
             // 
@@ -114,11 +114,11 @@ namespace ASCOM.GowerCDome
             // 
             this.comboBoxComPort.DropDownWidth = 90;
             this.comboBoxComPort.FormattingEnabled = true;
-            this.comboBoxComPort.Location = new System.Drawing.Point(168, 90);
+            this.comboBoxComPort.Location = new System.Drawing.Point(201, 91);
             this.comboBoxComPort.Name = "comboBoxComPort";
             this.comboBoxComPort.Size = new System.Drawing.Size(90, 21);
             this.comboBoxComPort.TabIndex = 7;
-            this.comboBoxComPort.Text = " ";
+            this.comboBoxComPort.Text = " Choose Port";
             this.comboBoxComPort.SelectedIndexChanged += new System.EventHandler(this.comboBoxComPort_SelectedIndexChanged);
             // 
             // label3
@@ -133,10 +133,11 @@ namespace ASCOM.GowerCDome
             // comboBoxComPortStepper
             // 
             this.comboBoxComPortStepper.FormattingEnabled = true;
-            this.comboBoxComPortStepper.Location = new System.Drawing.Point(169, 140);
+            this.comboBoxComPortStepper.Location = new System.Drawing.Point(202, 141);
             this.comboBoxComPortStepper.Name = "comboBoxComPortStepper";
             this.comboBoxComPortStepper.Size = new System.Drawing.Size(88, 21);
             this.comboBoxComPortStepper.TabIndex = 9;
+            this.comboBoxComPortStepper.Text = "Choose Port";
             // 
             // numericUpDownParkAzimuth
             // 
@@ -145,7 +146,7 @@ namespace ASCOM.GowerCDome
             0,
             0,
             0});
-            this.numericUpDownParkAzimuth.Location = new System.Drawing.Point(173, 186);
+            this.numericUpDownParkAzimuth.Location = new System.Drawing.Point(201, 183);
             this.numericUpDownParkAzimuth.Maximum = new decimal(new int[] {
             360,
             0,
@@ -177,17 +178,18 @@ namespace ASCOM.GowerCDome
             this.lblshutter.AutoSize = true;
             this.lblshutter.Location = new System.Drawing.Point(16, 119);
             this.lblshutter.Name = "lblshutter";
-            this.lblshutter.Size = new System.Drawing.Size(110, 13);
+            this.lblshutter.Size = new System.Drawing.Size(141, 13);
             this.lblshutter.TabIndex = 12;
-            this.lblshutter.Text = "Comm Port for Shutter";
+            this.lblshutter.Text = "Comm Port for Shutter Radio";
             // 
             // comboBoxComPortShutter
             // 
             this.comboBoxComPortShutter.FormattingEnabled = true;
-            this.comboBoxComPortShutter.Location = new System.Drawing.Point(169, 115);
+            this.comboBoxComPortShutter.Location = new System.Drawing.Point(202, 116);
             this.comboBoxComPortShutter.Name = "comboBoxComPortShutter";
             this.comboBoxComPortShutter.Size = new System.Drawing.Size(88, 21);
             this.comboBoxComPortShutter.TabIndex = 13;
+            this.comboBoxComPortShutter.Text = "Choose Port";
             // 
             // SetupDialogForm
             // 
