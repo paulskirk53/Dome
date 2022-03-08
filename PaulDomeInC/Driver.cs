@@ -430,9 +430,20 @@ namespace ASCOM.GowerCDome
         {
             get
             {
-                //pk todo
-                tl.LogMessage("AtHome Get", "Not implemented");
-                throw new ASCOM.PropertyNotImplementedException("AtHome", false);
+                tl.LogMessage("AtHome Get", "Is Now implemented Mar '22");
+                double CurrentAzimuth = Azimuth;
+                //pk todo remove hardcoding of Home position below
+
+                if (Math.Abs(CurrentAzimuth - 270.0) <= 3.0)   // care - assumes a fixed sensor position of 270.0 degrees
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+                
+              //  throw new ASCOM.PropertyNotImplementedException("AtHome", false);
             }
         }
 
@@ -502,8 +513,8 @@ namespace ASCOM.GowerCDome
         {
             get
             {
-                tl.LogMessage("CanFindHome Get", false.ToString());
-                return false;                                        
+                tl.LogMessage("CanFindHome Get", true.ToString());
+                return true;                                        
             }
         }
 
@@ -530,7 +541,7 @@ namespace ASCOM.GowerCDome
         {
             get
             {
-                tl.LogMessage("CanSetAzimuth Get", false.ToString());
+                tl.LogMessage("CanSetAzimuth Get", true.ToString());
                 // pk changed to return true
                 return true;
             }
@@ -540,7 +551,7 @@ namespace ASCOM.GowerCDome
         {
             get
             {
-                tl.LogMessage("CanSetPark Get", false.ToString());
+                tl.LogMessage("CanSetPark Get", true.ToString());
 
                 return true;
             }
@@ -586,8 +597,30 @@ namespace ASCOM.GowerCDome
 
         public void FindHome()
         {
-            tl.LogMessage("FindHome", "Not implemented");
-            throw new ASCOM.MethodNotImplementedException("FindHome");
+            // we need to implement this for the remote Observatory because if a power or MCU reset happens, we lose position
+            //findhome 'scans' for the fixed azimuth by slewing the dome and checking if the findhome sensor is activated
+            //if so, the MCU azimuth is set to that correct azimuth value associated with the sensor.
+            tl.LogMessage("FindHome", "Now implemented, March 2022");
+
+
+            try
+            {
+                pkstepper.ClearBuffers();
+
+                pkstepper.Transmit("FH#");
+            }
+            catch (Exception ex)
+            {
+
+                pkstepper.ClearBuffers();
+
+                pkstepper.Transmit("FH#");
+                // log
+                tl.LogMessage("Find home ", ex.ToString());
+            }
+
+
+            //            throw new ASCOM.MethodNotImplementedException("FindHome");
         }
 
         public void OpenShutter()                                          // 13-4-17
@@ -903,7 +936,7 @@ namespace ASCOM.GowerCDome
                 CompassComPort = driverProfile.GetValue(driverID, CompassEncoderPortProfileName, string.Empty, CompassComPort);
                 StepperComPort = driverProfile.GetValue(driverID, StepperPortProfileName, string.Empty, StepperComPort);
                 ShutterComPort = driverProfile.GetValue(driverID, ShutterPortProfileName, string.Empty, ShutterComPort);
-                temp =  driverProfile.GetValue(driverID, SetParkProfilename, Parkplace);
+                temp           = driverProfile.GetValue(driverID, SetParkProfilename, string.Empty, Parkplace);   //pk changed to add in string.Empty, as with the other lines here
                 double.TryParse(temp, out ParkAzimuth);   // this line sets the initial value of ParkAzimuth
                
             }
