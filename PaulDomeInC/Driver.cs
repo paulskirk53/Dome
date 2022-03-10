@@ -81,6 +81,7 @@ namespace ASCOM.GowerCDome
         internal static string CompassEncoderPortProfileName = "Encoder Port";
         internal static string ShutterPortProfileName        = "Shutter Port";
         internal static string SetParkProfilename            = "Set Park";
+        internal static string SetHomeProfilename            = "Set Home";
         internal static string comPortDefault                = "COM4";
         internal static string traceStateProfileName         = "Trace Level";
         internal static string traceStateDefault             = "false";
@@ -89,7 +90,9 @@ namespace ASCOM.GowerCDome
         internal static string StepperComPort;
         internal static string ShutterComPort;
         internal static string Parkplace;
+        internal static string Homeplace;
         internal static double ParkAzimuth;
+        internal static double HomeAzimuth;
         /// <summary>
         /// Private variable to hold the connected state
         /// </summary>
@@ -432,9 +435,9 @@ namespace ASCOM.GowerCDome
             {
                 tl.LogMessage("AtHome Get", "Is Now implemented Mar '22");
                 double CurrentAzimuth = Azimuth;
-                //pk todo remove hardcoding of Home position below
+                //pk todo remove hardcoding of Home position below - done
 
-                if (Math.Abs(CurrentAzimuth - 270.0) <= 3.0)   // care - assumes a fixed sensor position of 270.0 degrees
+                if (Math.Abs(CurrentAzimuth - HomeAzimuth) <= 3.0)   // care - assumes a fixed sensor position of 270.0 degrees
                 {
                     return true;
                 }
@@ -928,6 +931,8 @@ namespace ASCOM.GowerCDome
         internal void ReadProfile()
         {
              string temp;
+            string temp2;
+            //todo add code below for temp2 as per temp, to read the home position - done
             using (Profile driverProfile = new Profile())
             {
                 driverProfile.DeviceType = "Dome";
@@ -938,7 +943,11 @@ namespace ASCOM.GowerCDome
                 ShutterComPort = driverProfile.GetValue(driverID, ShutterPortProfileName, string.Empty, ShutterComPort);
                 temp           = driverProfile.GetValue(driverID, SetParkProfilename, string.Empty, Parkplace);   //pk changed to add in string.Empty, as with the other lines here
                 double.TryParse(temp, out ParkAzimuth);   // this line sets the initial value of ParkAzimuth
-               
+
+
+                temp2 = driverProfile.GetValue(driverID, SetHomeProfilename, string.Empty, Homeplace );   //pk changed to add in string.Empty, as with the other lines here
+                double.TryParse(temp2, out HomeAzimuth);
+
             }
         }
 
@@ -956,6 +965,7 @@ namespace ASCOM.GowerCDome
                 driverProfile.WriteValue(driverID, CompassEncoderPortProfileName, CompassComPort.ToString());
                 driverProfile.WriteValue(driverID, ShutterPortProfileName, ShutterComPort.ToString());
                 driverProfile.WriteValue(driverID, SetParkProfilename, Parkplace.ToString());
+                driverProfile.WriteValue(driverID, SetHomeProfilename, Homeplace.ToString());
             }
         }
 

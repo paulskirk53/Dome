@@ -41,8 +41,11 @@ namespace ASCOM.GowerCDome
             this.lblparkazimuth = new System.Windows.Forms.Label();
             this.lblshutter = new System.Windows.Forms.Label();
             this.comboBoxComPortShutter = new System.Windows.Forms.ComboBox();
+            this.numericUpDownHomeAzimuth = new System.Windows.Forms.NumericUpDown();
+            this.label4 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownParkAzimuth)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownHomeAzimuth)).BeginInit();
             this.SuspendLayout();
             // 
             // cmdOK
@@ -166,12 +169,11 @@ namespace ASCOM.GowerCDome
             // lblparkazimuth
             // 
             this.lblparkazimuth.AutoSize = true;
-            this.lblparkazimuth.Location = new System.Drawing.Point(25, 183);
+            this.lblparkazimuth.Location = new System.Drawing.Point(56, 186);
             this.lblparkazimuth.Name = "lblparkazimuth";
             this.lblparkazimuth.Size = new System.Drawing.Size(66, 13);
             this.lblparkazimuth.TabIndex = 11;
             this.lblparkazimuth.Text = "ParkAzimuth";
-            this.lblparkazimuth.Visible = false;
             // 
             // lblshutter
             // 
@@ -191,11 +193,45 @@ namespace ASCOM.GowerCDome
             this.comboBoxComPortShutter.TabIndex = 13;
             this.comboBoxComPortShutter.Text = "Choose Port";
             // 
+            // numericUpDownHomeAzimuth
+            // 
+            this.numericUpDownHomeAzimuth.Increment = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.numericUpDownHomeAzimuth.Location = new System.Drawing.Point(201, 215);
+            this.numericUpDownHomeAzimuth.Maximum = new decimal(new int[] {
+            360,
+            0,
+            0,
+            0});
+            this.numericUpDownHomeAzimuth.Name = "numericUpDownHomeAzimuth";
+            this.numericUpDownHomeAzimuth.Size = new System.Drawing.Size(85, 20);
+            this.numericUpDownHomeAzimuth.TabIndex = 14;
+            this.numericUpDownHomeAzimuth.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.numericUpDownHomeAzimuth.Value = new decimal(new int[] {
+            262,
+            0,
+            0,
+            0});
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(55, 215);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(75, 13);
+            this.label4.TabIndex = 15;
+            this.label4.Text = "Home Position";
+            // 
             // SetupDialogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(416, 270);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.numericUpDownHomeAzimuth);
             this.Controls.Add(this.comboBoxComPortShutter);
             this.Controls.Add(this.lblshutter);
             this.Controls.Add(this.lblparkazimuth);
@@ -219,6 +255,7 @@ namespace ASCOM.GowerCDome
             this.Load += new System.EventHandler(this.SetupDialogForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownParkAzimuth)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownHomeAzimuth)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -239,5 +276,7 @@ namespace ASCOM.GowerCDome
         private System.Windows.Forms.Label lblparkazimuth;
         private System.Windows.Forms.Label lblshutter;
         private System.Windows.Forms.ComboBox comboBoxComPortShutter;
+        private System.Windows.Forms.NumericUpDown numericUpDownHomeAzimuth;
+        private System.Windows.Forms.Label label4;
     }
 }

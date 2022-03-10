@@ -30,6 +30,7 @@ namespace ASCOM.GowerCDome
             Dome.StepperComPort = (string)comboBoxComPortStepper.SelectedItem;   //user selected port for stepper
             Dome.ShutterComPort = (string)comboBoxComPortShutter.SelectedItem;   //user selected port for stepper
             Dome.Parkplace = numericUpDownParkAzimuth.Value.ToString();
+            Dome.Homeplace = numericUpDownHomeAzimuth.Value.ToString();
             //System.Windows.Forms.MessageBox.Show(Dome.StepperComPort);            // put in to test -pops up a dialog showing value of comport selected
 
             // new code
@@ -95,6 +96,7 @@ namespace ASCOM.GowerCDome
 
             // the following line works to get the value from the ascom profile store into the numeric updown field on the setup dialog
             numericUpDownParkAzimuth.Value = (decimal)Dome.ParkAzimuth;  // ParkAzimuth comes from the driver ReadProfile()
+            numericUpDownHomeAzimuth.Value = (decimal)Dome.HomeAzimuth;  // HomeAzimuth comes from the driver ReadProfile()
         }
 
         private void comboBoxComPort_SelectedIndexChanged(object sender, EventArgs e)
