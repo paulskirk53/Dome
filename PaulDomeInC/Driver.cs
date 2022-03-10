@@ -4,25 +4,25 @@
 //
 // ASCOM Dome driver for GowerCDome
 //
-// Description:	Part one - THIS IS THE WORKING PROJECT FILE. iT has been tested initially with POTH 
-//				and a planetarium programme cartes du ciel. Also with SGP
-//
-//      Code for this revision is informd by 'dome driver program process - google sheets url
+// Description:	Part one - THIS IS THE WORKING PROJECT FILE. iT has been tested 
+//  2022 - we have moved on a lot and my understanding of what's going on is much greater!
+
+//      Code for this revision was initially informd by 'dome driver program process - google sheets url and this is where Tom How helped with the architecture stuff
 //      https://docs.google.com/spreadsheets/d/129XTTVrI_Kxw_0QjSZ3ILjBEWEoGZlBaUu5U1P22TgM/edit#gid=0
 //
 //
 // Implements:	ASCOM Dome interface version: <2>
-// Author:		(XXX) Paul Kirk <your@email.here>, base code by Tom How, Curdridge Observatory
+// Author:	 Paul Kirk <your@email.here>, with initial help from Tom How, Curdridge Observatory
 //
 // Edit Log:
 //
 // Date			Who	Vers	Description
 // -----------	---	-----	-------------------------------------------------------
-// 4-3-2017	XXX	6.0.0	Initial edit, created from ASCOM driver template
+// 4-3-2017	XXX	6.0.0	Initial edit, created from ASCOM driver template - many edits since, all in github
 // --------------------------------------------------------------------------------
 
 // 14-8-17 tested with telescope sim for.net, POTH and C du Ciel - see notes in wordpad file  in folder 'domestuff'
-// stepper moves as expected when tracking and doing gotos in this simulator environment
+// 10-3-2022 - five years on....
 
 
 // This is used to define code in the template that is specific to one class implementation
