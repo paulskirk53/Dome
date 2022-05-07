@@ -258,11 +258,6 @@ namespace ASCOM.GowerCDome
             {
                 pkstepper = OpenPort(StepperComPort);
 
-                //the stepper needs to be initialised on connection to avoid failure linked to a previous goto when a system wide
-                //restart of equipment is required.
-
-                initialise_stepper();
-
                 // set the compass (now encoder) connection
                 pkcompass = OpenPort(CompassComPort);
                 pkShutter = OpenPort(ShutterComPort);
