@@ -25,7 +25,7 @@ namespace ASCOM.GowerCDome
             // Place any validation constraint checks here
             // Update the state variables with results from the dialogue
             Dome.comPort = (string)comboBoxComPort.SelectedItem;
-            Dome.tl.Enabled = chkTrace.Checked; 
+            Dome.tl.Enabled = chkTrace.Checked;
             Dome.CompassComPort = (string)comboBoxComPort.SelectedItem;          //user selected port for compass
             Dome.StepperComPort = (string)comboBoxComPortStepper.SelectedItem;   //user selected port for stepper
             Dome.ShutterComPort = (string)comboBoxComPortShutter.SelectedItem;   //user selected port for stepper
@@ -97,21 +97,135 @@ namespace ASCOM.GowerCDome
             // the following line works to get the value from the ascom profile store into the numeric updown field on the setup dialog
             numericUpDownParkAzimuth.Value = (decimal)Dome.ParkAzimuth;  // ParkAzimuth comes from the driver ReadProfile()
             numericUpDownHomeAzimuth.Value = (decimal)Dome.HomeAzimuth;  // HomeAzimuth comes from the driver ReadProfile()
+
+
+            
+
+
         }
 
-        private void comboBoxComPort_SelectedIndexChanged(object sender, EventArgs e)
+        //new code sept '22
+
+
+        private string portFinder(ASCOM.Utilities.Serial testPort, string mcuName)  //mcuName will be e.g "encoder" or "stepper"
+        {
+            /*
+             * This routine uses a test port to cycle through the portnames (COM1, COM3 etc), checking each port 
+             *  by sending a string recognised by a particular MCU e.g. stepper# or encoder#
+             *  if the mcu is on the port, it responds with stepper# or encoder#
+             * */
+            setupThePort(testPort);            //set the parameters for testport - baud etc
+            bool found = false;
+            foreach (string portName in GetUnusedSerialPorts())     // GetUnusedSerialPorts forms a list of COM ports which are available
+            {
+                found = checkforMCU(testPort, portName, mcuName);     // this checks if the current portName responds to mcuName (stepper# / emcoder#)
+                if (found)
+                {
+
+                    testPort.Connected = false;                    //disconnect the port
+                    return portName;
+
+                }
+
+
+            }
+            return null;                // if no ports respond to queries (e.g. perhaps mcus are not connected), the nukk return is picked by the try - catch exception
+                                        // of encoder connect or stepper connect
+        }
+
+        private bool checkforMCU(ASCOM.Utilities.Serial testPort, string portName, string MCUDescription)
         {
 
-        }
+            testPort.PortName = portName;  //                      
+            testPort.Connected = true;
 
-        private void numericUpDownParkAzimuth_ValueChanged(object sender, EventArgs e)
+            //now send data and see what comes back
+            try
+            {
+
+                testPort.Transmit(MCUDescription);            // transmits encoder# or stepper# depending upon where called
+                string response = testPort.ReceiveTerminated("#");   // not all ports respond to a query and those which don't respond will timeout
+
+
+                if (response == MCUDescription)
+                {
+
+                    return true;            //mcu response match
+                }
+
+                testPort.Connected = false;
+                return false;              // if there was a response it was not the right MCU
+            }
+            catch (Exception e)     //TimeoutException
+            {
+
+                testPort.Connected = false;    // no response
+
+            }
+
+            return false;
+        }
+        private void setupThePort(ASCOM.Utilities.Serial testPort)
         {
+            //set all the port propereties
+
+            testPort.DTREnable = false;
+            testPort.RTSEnable = false;
+            testPort.ReceiveTimeout = 5;
+
+            testPort.Speed = ASCOM.Utilities.SerialSpeed.ps19200;
+
+
 
         }
 
-        private void SetupDialogForm_Load(object sender, EventArgs e)
+
+
+        private string[] GetUnusedSerialPorts()                     //string[] is a string array
         {
+            using (ASCOM.Utilities.Serial temp = new ASCOM.Utilities.Serial())
+            {
+                var ports = new List<string>(temp.AvailableCOMPorts); // List<T> class constructor is used to create a List object of type T. So in this case, available comports
+                var busyPorts = new List<string>();
 
+                foreach (var port in ports)
+                {
+                    try
+                    {
+                        temp.PortName = port;
+
+                        temp.Connected = true;
+                        temp.Connected = false;
+                    }
+                    catch (Exception)
+                    {
+
+                        // If we get here then the current port is currently in use so add it to the busy ports list.
+
+                        busyPorts.Add(port);
+                    }
+                }
+
+                // Remove the busy ports from the return list.
+
+                foreach (var busyPort in busyPorts)
+                {
+                    ports.Remove(busyPort);
+                }
+
+                return ports.ToArray();               // I think this returns a clean sequential list - no gaps  
+            }
         }
-    }
+
+
+
+
+
+    }  // end public partial class
+
+
 }
+
+       //
+       
+    

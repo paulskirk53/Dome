@@ -122,7 +122,7 @@ namespace ASCOM.GowerCDome
             this.comboBoxComPort.Size = new System.Drawing.Size(90, 21);
             this.comboBoxComPort.TabIndex = 7;
             this.comboBoxComPort.Text = " Choose Port";
-            this.comboBoxComPort.SelectedIndexChanged += new System.EventHandler(this.comboBoxComPort_SelectedIndexChanged);
+           // this.comboBoxComPort.SelectedIndexChanged += new System.EventHandler(this.comboBoxComPort_SelectedIndexChanged);
             // 
             // label3
             // 
@@ -164,7 +164,7 @@ namespace ASCOM.GowerCDome
             0,
             0,
             0});
-            this.numericUpDownParkAzimuth.ValueChanged += new System.EventHandler(this.numericUpDownParkAzimuth_ValueChanged);
+           // this.numericUpDownParkAzimuth.ValueChanged += new System.EventHandler(this.numericUpDownParkAzimuth_ValueChanged);
             // 
             // lblparkazimuth
             // 
@@ -252,7 +252,7 @@ namespace ASCOM.GowerCDome
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Gower Dome Setup";
-            this.Load += new System.EventHandler(this.SetupDialogForm_Load);
+           // this.Load += new System.EventHandler(this.SetupDialogForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownParkAzimuth)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownHomeAzimuth)).EndInit();
