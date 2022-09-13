@@ -106,7 +106,7 @@ namespace ASCOM.GowerCDome
 
                     temp.PortName = portName;
 
-                    MessageBox.Show("the shutter portname is " + temp.PortName);
+                   // MessageBox.Show("the shutter portname is " + temp.PortName);
 
                     LBLShutter.Text = LBLShutter.Text + "Port is " + temp.PortName;
                   
@@ -148,7 +148,7 @@ namespace ASCOM.GowerCDome
                 found = checkforMCU(testPort, portName, mcuName);     // this checks if the current portName responds to mcuName (stepper# / emcoder#)
                 if (found)
                 {
-                    MessageBox.Show("the port is found " + portName);
+                  //  MessageBox.Show("the port is found " + portName);
                     testPort.Connected = false;                    //disconnect the port
                     return portName;
 
@@ -165,15 +165,19 @@ namespace ASCOM.GowerCDome
 
             testPort.PortName = portName;  //                      
             testPort.Connected = true;
-
-            //now send data and see what comes back
+            
+            // send data to the MCU and see what comes back
             try
             {
-                MessageBox.Show("the value of MCUDescription " + MCUDescription);
-               // testPort.Transmit(MCUDescription);
-                testPort.Transmit(MCUDescription);            // transmits encoder# or stepper# depending upon where called
-                string response = testPort.ReceiveTerminated("#");   // not all ports respond to a query and those which don't respond will timeout
-                MessageBox.Show("the response from the MCU " + response);
+                
+                // MessageBox.Show("the value of MCUDescription " + MCUDescription);
+               
+                testPort.Transmit(MCUDescription);                   // transmits encoder# or stepper# depending upon where called
+                
+            
+                string  response = testPort.ReceiveTerminated("#");   // not all ports respond to a query and those which don't respond will timeout
+             
+               // MessageBox.Show("the response from the MCU " + response);
               
                 if (response == MCUDescription)
                 {
@@ -199,7 +203,7 @@ namespace ASCOM.GowerCDome
 
             testPort.DTREnable = false;
             testPort.RTSEnable = false;
-            testPort.ReceiveTimeout = 5;
+            testPort.ReceiveTimeout = 10;
 
             testPort.Speed = ASCOM.Utilities.SerialSpeed.ps19200;
 
