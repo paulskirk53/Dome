@@ -82,7 +82,7 @@ namespace ASCOM.GowerCDome
             {
                 comboBoxComPort.SelectedItem = Dome.CompassComPort;    // the item that appears in the combobox at form load
             }
-            //new
+            
 
             if (comboBoxComPortStepper.Items.Contains(Dome.StepperComPort))   // see the driver code - this is set in the connected proerty
             {
@@ -92,7 +92,33 @@ namespace ASCOM.GowerCDome
             {
                 comboBoxComPortShutter.SelectedItem = Dome.ShutterComPort;    // the item that appears in the combobox at form load
             }
-            //end new
+
+
+            try
+            {
+                using (ASCOM.Utilities.Serial temp = new ASCOM.Utilities.Serial())
+                {
+               
+
+                    string portName = portFinder(temp, "focuser#");    // this routine returns the port name that replied e.g. COM7
+
+                     
+
+                    temp.PortName = portName;
+
+                    MessageBox.Show("the shutter portname is " + temp.PortName);
+
+                    LBLShutter.Text = LBLShutter.Text + "Port is " + temp.PortName;
+                  
+                }
+                //  throw new wrongPortException();
+            }
+            catch (Exception ex)              
+            {
+                // substitute this when you get to it MessageBox.Show(ex.Message + "Stepper connection failed. Check the MCUs are on, connected, and in receive mode.");
+                MessageBox.Show("Shutter connection failed. Check the MCUs are on, connected, and in receive mode." + ex.Message);
+            }
+
 
             // the following line works to get the value from the ascom profile store into the numeric updown field on the setup dialog
             numericUpDownParkAzimuth.Value = (decimal)Dome.ParkAzimuth;  // ParkAzimuth comes from the driver ReadProfile()
@@ -118,10 +144,11 @@ namespace ASCOM.GowerCDome
             bool found = false;
             foreach (string portName in GetUnusedSerialPorts())     // GetUnusedSerialPorts forms a list of COM ports which are available
             {
+                MessageBox.Show("the port is " + portName);        //tis worked
                 found = checkforMCU(testPort, portName, mcuName);     // this checks if the current portName responds to mcuName (stepper# / emcoder#)
                 if (found)
                 {
-
+                    MessageBox.Show("the port is found " + portName);
                     testPort.Connected = false;                    //disconnect the port
                     return portName;
 
@@ -142,11 +169,12 @@ namespace ASCOM.GowerCDome
             //now send data and see what comes back
             try
             {
-
+                MessageBox.Show("the value of MCUDescription " + MCUDescription);
+               // testPort.Transmit(MCUDescription);
                 testPort.Transmit(MCUDescription);            // transmits encoder# or stepper# depending upon where called
                 string response = testPort.ReceiveTerminated("#");   // not all ports respond to a query and those which don't respond will timeout
-
-
+                MessageBox.Show("the response from the MCU " + response);
+              
                 if (response == MCUDescription)
                 {
 
@@ -160,7 +188,7 @@ namespace ASCOM.GowerCDome
             {
 
                 testPort.Connected = false;    // no response
-
+                MessageBox.Show("the MCU  did not respond to  " + MCUDescription);
             }
 
             return false;
@@ -194,6 +222,9 @@ namespace ASCOM.GowerCDome
                     {
                         temp.PortName = port;
 
+
+                       // MessageBox.Show("non busy port is " + port);
+
                         temp.Connected = true;
                         temp.Connected = false;
                     }
@@ -203,6 +234,7 @@ namespace ASCOM.GowerCDome
                         // If we get here then the current port is currently in use so add it to the busy ports list.
 
                         busyPorts.Add(port);
+                                               
                     }
                 }
 
