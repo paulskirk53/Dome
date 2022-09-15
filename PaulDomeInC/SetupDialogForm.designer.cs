@@ -52,7 +52,7 @@ namespace ASCOM.GowerCDome
             // 
             this.cmdOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cmdOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.cmdOK.Location = new System.Drawing.Point(397, 239);
+            this.cmdOK.Location = new System.Drawing.Point(357, 239);
             this.cmdOK.Name = "cmdOK";
             this.cmdOK.Size = new System.Drawing.Size(59, 24);
             this.cmdOK.TabIndex = 0;
@@ -64,7 +64,7 @@ namespace ASCOM.GowerCDome
             // 
             this.cmdCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cmdCancel.Location = new System.Drawing.Point(397, 269);
+            this.cmdCancel.Location = new System.Drawing.Point(357, 269);
             this.cmdCancel.Name = "cmdCancel";
             this.cmdCancel.Size = new System.Drawing.Size(59, 25);
             this.cmdCancel.TabIndex = 1;
@@ -85,7 +85,7 @@ namespace ASCOM.GowerCDome
             this.picASCOM.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.picASCOM.Cursor = System.Windows.Forms.Cursors.Hand;
             this.picASCOM.Image = global::ASCOM.GowerCDome.Properties.Resources.ASCOM;
-            this.picASCOM.Location = new System.Drawing.Point(408, 9);
+            this.picASCOM.Location = new System.Drawing.Point(368, 9);
             this.picASCOM.Name = "picASCOM";
             this.picASCOM.Size = new System.Drawing.Size(48, 56);
             this.picASCOM.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
@@ -99,9 +99,9 @@ namespace ASCOM.GowerCDome
             this.LBLAzimuth.AutoSize = true;
             this.LBLAzimuth.Location = new System.Drawing.Point(16, 93);
             this.LBLAzimuth.Name = "LBLAzimuth";
-            this.LBLAzimuth.Size = new System.Drawing.Size(131, 13);
+            this.LBLAzimuth.Size = new System.Drawing.Size(113, 13);
             this.LBLAzimuth.TabIndex = 5;
-            this.LBLAzimuth.Text = "Comm Port for Az Encoder";
+            this.LBLAzimuth.Text = "Az Encoder on            ";
             // 
             // chkTrace
             // 
@@ -117,29 +117,31 @@ namespace ASCOM.GowerCDome
             // 
             this.comboBoxComPort.DropDownWidth = 90;
             this.comboBoxComPort.FormattingEnabled = true;
-            this.comboBoxComPort.Location = new System.Drawing.Point(234, 91);
+            this.comboBoxComPort.Location = new System.Drawing.Point(258, 91);
             this.comboBoxComPort.Name = "comboBoxComPort";
             this.comboBoxComPort.Size = new System.Drawing.Size(90, 21);
             this.comboBoxComPort.TabIndex = 7;
             this.comboBoxComPort.Text = " Choose Port";
+            this.comboBoxComPort.SelectionChangeCommitted += new System.EventHandler(this.comboBoxComPort_SelectionChangeCommitted);
             // 
             // LBLStepper
             // 
             this.LBLStepper.AutoSize = true;
             this.LBLStepper.Location = new System.Drawing.Point(16, 141);
             this.LBLStepper.Name = "LBLStepper";
-            this.LBLStepper.Size = new System.Drawing.Size(105, 13);
+            this.LBLStepper.Size = new System.Drawing.Size(119, 13);
             this.LBLStepper.TabIndex = 8;
-            this.LBLStepper.Text = "Com Port for Stepper";
+            this.LBLStepper.Text = "Dome drive Stepper on ";
             // 
             // comboBoxComPortStepper
             // 
             this.comboBoxComPortStepper.FormattingEnabled = true;
-            this.comboBoxComPortStepper.Location = new System.Drawing.Point(235, 141);
+            this.comboBoxComPortStepper.Location = new System.Drawing.Point(259, 141);
             this.comboBoxComPortStepper.Name = "comboBoxComPortStepper";
             this.comboBoxComPortStepper.Size = new System.Drawing.Size(88, 21);
             this.comboBoxComPortStepper.TabIndex = 9;
             this.comboBoxComPortStepper.Text = "Choose Port";
+            this.comboBoxComPortStepper.SelectionChangeCommitted += new System.EventHandler(this.comboBoxComPortStepper_SelectionChangeCommitted);
             // 
             // numericUpDownParkAzimuth
             // 
@@ -178,18 +180,19 @@ namespace ASCOM.GowerCDome
             this.LBLShutter.AutoSize = true;
             this.LBLShutter.Location = new System.Drawing.Point(16, 119);
             this.LBLShutter.Name = "LBLShutter";
-            this.LBLShutter.Size = new System.Drawing.Size(141, 13);
+            this.LBLShutter.Size = new System.Drawing.Size(117, 13);
             this.LBLShutter.TabIndex = 12;
-            this.LBLShutter.Text = "Comm Port for Shutter Radio";
+            this.LBLShutter.Text = "Shutter Radio on          ";
             // 
             // comboBoxComPortShutter
             // 
             this.comboBoxComPortShutter.FormattingEnabled = true;
-            this.comboBoxComPortShutter.Location = new System.Drawing.Point(235, 116);
+            this.comboBoxComPortShutter.Location = new System.Drawing.Point(259, 116);
             this.comboBoxComPortShutter.Name = "comboBoxComPortShutter";
             this.comboBoxComPortShutter.Size = new System.Drawing.Size(88, 21);
             this.comboBoxComPortShutter.TabIndex = 13;
             this.comboBoxComPortShutter.Text = "Choose Port";
+            this.comboBoxComPortShutter.SelectionChangeCommitted += new System.EventHandler(this.comboBoxComPortShutter_SelectionChangeCommitted);
             // 
             // numericUpDownHomeAzimuth
             // 
@@ -227,7 +230,7 @@ namespace ASCOM.GowerCDome
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(466, 302);
+            this.ClientSize = new System.Drawing.Size(426, 302);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.numericUpDownHomeAzimuth);
             this.Controls.Add(this.comboBoxComPortShutter);

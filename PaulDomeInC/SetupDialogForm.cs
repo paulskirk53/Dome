@@ -7,12 +7,18 @@ using System.Text;
 using System.Windows.Forms;
 using ASCOM.Utilities;
 using ASCOM.GowerCDome;
+using System.Threading;
 
 namespace ASCOM.GowerCDome
 {
+
+
     [ComVisible(false)]					// Form not registered for COM!
+
+    
     public partial class SetupDialogForm : Form
     {
+     
         public SetupDialogForm()
         {
             InitializeComponent();
@@ -22,6 +28,7 @@ namespace ASCOM.GowerCDome
 
         private void cmdOK_Click(object sender, EventArgs e) // OK button event handler
         {
+            
             // Place any validation constraint checks here
             // Update the state variables with results from the dialogue
             Dome.comPort = (string)comboBoxComPort.SelectedItem;
@@ -31,17 +38,9 @@ namespace ASCOM.GowerCDome
             Dome.ShutterComPort = (string)comboBoxComPortShutter.SelectedItem;   //user selected port for stepper
             Dome.Parkplace = numericUpDownParkAzimuth.Value.ToString();
             Dome.Homeplace = numericUpDownHomeAzimuth.Value.ToString();
-            //System.Windows.Forms.MessageBox.Show(Dome.StepperComPort);            // put in to test -pops up a dialog showing value of comport selected
+          //  System.Windows.Forms.MessageBox.Show(Dome.StepperComPort);            // put in to test -pops up a dialog showing value of comport selected
 
-            // new code
-
-            // open new gowerdome interface form - probably not here but in the chosser ok button if possible
-            //  this.Hide();
-            //  GowerDome_interface f2 = new GowerDome_interface();
-            //  f2.ShowDialog();
-
-
-            //end new code
+     
 
         }
 
@@ -69,6 +68,14 @@ namespace ASCOM.GowerCDome
 
         private void InitUI()
         {
+            cmdOK.Enabled = false;     // disable the ok button until ports are picked todo pk
+
+            //set the three globals to false - these will be set to true if the com port combo box selection change committed event fires (i.e. a comport is picked by the user)
+
+            myGlobals.check1 = false;
+            myGlobals.check2 = false;
+            myGlobals.check3 = false;
+
             chkTrace.Checked = Dome.tl.Enabled;
             // set the list of com ports to those that are currently available
             comboBoxComPort.Items.Clear();        //compass
@@ -82,7 +89,7 @@ namespace ASCOM.GowerCDome
             {
                 comboBoxComPort.SelectedItem = Dome.CompassComPort;    // the item that appears in the combobox at form load
             }
-            
+
 
             if (comboBoxComPortStepper.Items.Contains(Dome.StepperComPort))   // see the driver code - this is set in the connected proerty
             {
@@ -93,58 +100,81 @@ namespace ASCOM.GowerCDome
                 comboBoxComPortShutter.SelectedItem = Dome.ShutterComPort;    // the item that appears in the combobox at form load
             }
 
+        //    MessageBox.Show((string)comboBoxComPortShutter.SelectedValue);
+        //    if (comboBoxComPortShutter.SelectedValue  != null)
+        //    {
+        //        cmdOK.Enabled = true;
+        //    }
+
+            // todo try this make a list of available ports - like Ricks ports list and each time a port returns a non null portname below, remove it from the  ports list - busyPorts.Remove(port);
+            // then in the foreach loop instead of using the list currently in use, scan through the unused list
+
+            //  using (ASCOM.Utilities.Serial temp = new ASCOM.Utilities.Serial())
+
+            ASCOM.Utilities.Serial tempPort = new ASCOM.Utilities.Serial();     // setup a variable as an ascom utils serial object
+
+            var portlist = new List<string>(tempPort.AvailableCOMPorts);         // create a list of available comports on tempPort
+
+            //  foreach (var port in portlist)
+            //  {
+            //      MessageBox.Show(" " + port);
+
+            //  }
 
             try
             {
-                using (ASCOM.Utilities.Serial temp = new ASCOM.Utilities.Serial())
-                {
-               
+                
+                string portName;
+                portName = portFinder(tempPort, "shutter#", portlist);          // this routine returns the port name that replied e.g. COM7
+                
+                LBLShutter.Text = checkForNull(portName, "Shutter");
+                portlist.Remove(portName);                                      // remove from the portlist to reduce the list size and future processing time
 
-                    string portName = portFinder(temp, "focuser#");    // this routine returns the port name that replied e.g. COM7
+                portName = portFinder(tempPort, "azimuth#", portlist);
+                LBLAzimuth.Text = checkForNull(portName, "Azimuth encoder");
+                portlist.Remove(portName);
 
-                     
-
-                    temp.PortName = portName;
-
-                   // MessageBox.Show("the shutter portname is " + temp.PortName);
-
-                    LBLShutter.Text = LBLShutter.Text + "Port is " + temp.PortName;
-                  
-                }
-                //  throw new wrongPortException();
+                portName = portFinder(tempPort, "stepper#", portlist);
+                LBLStepper.Text = checkForNull(portName, "Dome drive");
             }
-            catch (Exception ex)              
+
+            catch (Exception ex)
             {
-                // substitute this when you get to it MessageBox.Show(ex.Message + "Stepper connection failed. Check the MCUs are on, connected, and in receive mode.");
-                MessageBox.Show("Shutter connection failed. Check the MCUs are on, connected, and in receive mode." + ex.Message);
+                
+                MessageBox.Show(" connection failed. Check the MCUs are on, connected, and in receive mode." + ex.Message);
             }
 
 
-            // the following line works to get the value from the ascom profile store into the numeric updown field on the setup dialog
-            numericUpDownParkAzimuth.Value = (decimal)Dome.ParkAzimuth;  // ParkAzimuth comes from the driver ReadProfile()
-            numericUpDownHomeAzimuth.Value = (decimal)Dome.HomeAzimuth;  // HomeAzimuth comes from the driver ReadProfile()
-
-
-            
 
 
         }
+            
 
-        //new code sept '22
 
-
-        private string portFinder(ASCOM.Utilities.Serial testPort, string mcuName)  //mcuName will be e.g "encoder" or "stepper"
+            private string checkForNull( string portName, string mcu)
         {
-            /*
-             * This routine uses a test port to cycle through the portnames (COM1, COM3 etc), checking each port 
-             *  by sending a string recognised by a particular MCU e.g. stepper# or encoder#
-             *  if the mcu is on the port, it responds with stepper# or encoder#
-             * */
+            if (portName== null)
+            {
+                return mcu + " Unavailable check connection";
+            }
+            else
+            {
+                return mcu + " is on " + portName;
+            }
+        }
+
+        private string portFinder(ASCOM.Utilities.Serial testPort, string mcuName, List<string> portlist)  //mcuName will be e.g "encoder" or "stepper"
+        {
+            //*
+            // * This routine uses a test port to cycle through the portnames (COM1, COM3 etc), checking each port 
+             //*  by sending a string recognised by a particular MCU e.g. stepper# or encoder#
+             //*  if the mcu is on the port, it responds with stepper# or encoder#
+             //*
             setupThePort(testPort);            //set the parameters for testport - baud etc
             bool found = false;
-            foreach (string portName in GetUnusedSerialPorts())     // GetUnusedSerialPorts forms a list of COM ports which are available
+            foreach (string portName in portlist)     // GetUnusedSerialPorts forms a list of COM ports which are available
             {
-                MessageBox.Show("the port is " + portName);        //tis worked
+               // MessageBox.Show("the port being checked is " + portName);        //tis worked
                 found = checkforMCU(testPort, portName, mcuName);     // this checks if the current portName responds to mcuName (stepper# / emcoder#)
                 if (found)
                 {
@@ -158,6 +188,7 @@ namespace ASCOM.GowerCDome
             }
             return null;                // if no ports respond to queries (e.g. perhaps mcus are not connected), the nukk return is picked by the try - catch exception
                                         // of encoder connect or stepper connect
+          //  throw new NullReferenceException();
         }
 
         private bool checkforMCU(ASCOM.Utilities.Serial testPort, string portName, string MCUDescription)
@@ -165,12 +196,13 @@ namespace ASCOM.GowerCDome
 
             testPort.PortName = portName;  //                      
             testPort.Connected = true;
+            Thread.Sleep(2000);           // delay (in mS) - essential if the MCU is Arduino with a bootloader. The Arduino requires time after the port is connected before it can respond to serial requests.
             
             // send data to the MCU and see what comes back
             try
             {
                 
-                // MessageBox.Show("the value of MCUDescription " + MCUDescription);
+                // MessageBox.Show("Sending " + MCUDescription + " to port " + portName);
                
                 testPort.Transmit(MCUDescription);                   // transmits encoder# or stepper# depending upon where called
                 
@@ -181,18 +213,23 @@ namespace ASCOM.GowerCDome
               
                 if (response == MCUDescription)
                 {
-
+                    testPort.Connected = false;
                     return true;            //mcu response match
                 }
+                else
+                {
+                    testPort.Connected = false;
+                    return false;
+                }
 
-                testPort.Connected = false;
-                return false;              // if there was a response it was not the right MCU
+               
+               // return false;              // if there was a response it was not the right MCU
             }
             catch (Exception e)     //TimeoutException
             {
 
                 testPort.Connected = false;    // no response
-                MessageBox.Show("the MCU  did not respond to  " + MCUDescription);
+               // MessageBox.Show("the MCU  did not respond to  " + MCUDescription);
             }
 
             return false;
@@ -203,7 +240,7 @@ namespace ASCOM.GowerCDome
 
             testPort.DTREnable = false;
             testPort.RTSEnable = false;
-            testPort.ReceiveTimeout = 10;
+            testPort.ReceiveTimeout = 5;
 
             testPort.Speed = ASCOM.Utilities.SerialSpeed.ps19200;
 
@@ -211,55 +248,44 @@ namespace ASCOM.GowerCDome
 
         }
 
+        
 
+       
 
-        private string[] GetUnusedSerialPorts()                     //string[] is a string array
+        private void comboBoxComPort_SelectionChangeCommitted(object sender, EventArgs e)   // bad name for the combo - this is the selection change for the azimuth comport
         {
-            using (ASCOM.Utilities.Serial temp = new ASCOM.Utilities.Serial())
-            {
-                var ports = new List<string>(temp.AvailableCOMPorts); // List<T> class constructor is used to create a List object of type T. So in this case, available comports
-                var busyPorts = new List<string>();
-
-                foreach (var port in ports)
-                {
-                    try
-                    {
-                        temp.PortName = port;
-
-
-                       // MessageBox.Show("non busy port is " + port);
-
-                        temp.Connected = true;
-                        temp.Connected = false;
-                    }
-                    catch (Exception)
-                    {
-
-                        // If we get here then the current port is currently in use so add it to the busy ports list.
-
-                        busyPorts.Add(port);
-                                               
-                    }
-                }
-
-                // Remove the busy ports from the return list.
-
-                foreach (var busyPort in busyPorts)
-                {
-                    ports.Remove(busyPort);
-                }
-
-                return ports.ToArray();               // I think this returns a clean sequential list - no gaps  
-            }
+            
+            myGlobals.check1 = true;
+            overallCheck();
         }
 
+        private void comboBoxComPortShutter_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            myGlobals.check2 = true;
+            overallCheck();
+        }
 
-
-
-
+        private void comboBoxComPortStepper_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            myGlobals.check3 = true;
+            overallCheck();
+        }
+        private void overallCheck()      // a way of checking if all the com ports have been picked by the end user.
+        {
+            if (myGlobals.check1 && myGlobals.check2 && myGlobals.check3)
+            {
+                cmdOK.Enabled = true;
+            }
+        }
     }  // end public partial class
 
+    public static class myGlobals     // this is a way of making a global variable set, accessible fom anywhere in the namespace. It's used to determine if all the com ports have been selected.
+    {
+        public static bool check1 = false;
+        public static bool check2 = false;
+        public static bool check3 = false;
 
+    }
 }
 
        //
