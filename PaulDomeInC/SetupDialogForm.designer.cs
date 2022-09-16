@@ -43,6 +43,7 @@ namespace ASCOM.GowerCDome
             this.comboBoxComPortShutter = new System.Windows.Forms.ComboBox();
             this.numericUpDownHomeAzimuth = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
+            this.btnApply = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownParkAzimuth)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownHomeAzimuth)).BeginInit();
@@ -226,11 +227,22 @@ namespace ASCOM.GowerCDome
             this.label4.TabIndex = 15;
             this.label4.Text = "Home Position";
             // 
+            // btnApply
+            // 
+            this.btnApply.Location = new System.Drawing.Point(355, 205);
+            this.btnApply.Name = "btnApply";
+            this.btnApply.Size = new System.Drawing.Size(60, 29);
+            this.btnApply.TabIndex = 16;
+            this.btnApply.Text = "Apply";
+            this.btnApply.UseVisualStyleBackColor = true;
+            this.btnApply.Click += new System.EventHandler(this.btnApply_Click);
+            // 
             // SetupDialogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(426, 302);
+            this.Controls.Add(this.btnApply);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.numericUpDownHomeAzimuth);
             this.Controls.Add(this.comboBoxComPortShutter);
@@ -278,5 +290,6 @@ namespace ASCOM.GowerCDome
         private System.Windows.Forms.ComboBox comboBoxComPortShutter;
         private System.Windows.Forms.NumericUpDown numericUpDownHomeAzimuth;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Button btnApply;
     }
 }

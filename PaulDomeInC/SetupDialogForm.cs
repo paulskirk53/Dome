@@ -84,6 +84,10 @@ namespace ASCOM.GowerCDome
             comboBoxComPort.Items.AddRange(System.IO.Ports.SerialPort.GetPortNames());             // use System.IO because it's static
             comboBoxComPortShutter.Items.AddRange(System.IO.Ports.SerialPort.GetPortNames());      // use System.IO because it's static
             comboBoxComPortStepper.Items.AddRange(System.IO.Ports.SerialPort.GetPortNames());      // pk code
+            comboBoxComPortStepper.Items.Remove("COM1");                                           //com1 not used by MCU
+            comboBoxComPort.Items.Remove("COM1");
+            comboBoxComPortShutter.Items.Remove("COM1");
+
             // select the current port if possible
             if (comboBoxComPort.Items.Contains(Dome.CompassComPort))   // see the driver code - this is set to a value of 4 - i.e. com4 is default
             {
@@ -100,26 +104,15 @@ namespace ASCOM.GowerCDome
                 comboBoxComPortShutter.SelectedItem = Dome.ShutterComPort;    // the item that appears in the combobox at form load
             }
 
-        //    MessageBox.Show((string)comboBoxComPortShutter.SelectedValue);
-        //    if (comboBoxComPortShutter.SelectedValue  != null)
-        //    {
-        //        cmdOK.Enabled = true;
-        //    }
+ 
 
-            // todo try this make a list of available ports - like Ricks ports list and each time a port returns a non null portname below, remove it from the  ports list - busyPorts.Remove(port);
-            // then in the foreach loop instead of using the list currently in use, scan through the unused list
-
-            //  using (ASCOM.Utilities.Serial temp = new ASCOM.Utilities.Serial())
-
+ 
             ASCOM.Utilities.Serial tempPort = new ASCOM.Utilities.Serial();     // setup a variable as an ascom utils serial object
 
             var portlist = new List<string>(tempPort.AvailableCOMPorts);         // create a list of available comports on tempPort
+            portlist.Remove("COM1");                                             // COM1 is never used by MCUs
 
-            //  foreach (var port in portlist)
-            //  {
-            //      MessageBox.Show(" " + port);
-
-            //  }
+        //now send id messages to each port in the list to find which MCU is attached to which port.
 
             try
             {
@@ -196,7 +189,7 @@ namespace ASCOM.GowerCDome
 
             testPort.PortName = portName;  //                      
             testPort.Connected = true;
-            Thread.Sleep(2000);           // delay (in mS) - essential if the MCU is Arduino with a bootloader. The Arduino requires time after the port is connected before it can respond to serial requests.
+            Thread.Sleep(500);           // delay (in mS) - essential if the MCU is Arduino with a bootloader. The Arduino requires time after the port is connected before it can respond to serial requests.
             
             // send data to the MCU and see what comes back
             try
@@ -276,6 +269,14 @@ namespace ASCOM.GowerCDome
             {
                 cmdOK.Enabled = true;
             }
+        }
+
+        private void btnApply_Click(object sender, EventArgs e)
+        {
+            myGlobals.check1 = true;
+            myGlobals.check2 = true;
+            myGlobals.check3 = true;
+            overallCheck();
         }
     }  // end public partial class
 
