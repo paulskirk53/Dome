@@ -78,9 +78,10 @@ namespace ASCOM.GowerCDome
             // 
             this.label1.Location = new System.Drawing.Point(12, 34);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(143, 41);
+            this.label1.Size = new System.Drawing.Size(458, 41);
             this.label1.TabIndex = 2;
             this.label1.Text = "Driver settings for Azimuth and stepper ports.";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // picASCOM
             // 
@@ -99,7 +100,7 @@ namespace ASCOM.GowerCDome
             // LBLAzimuth
             // 
             this.LBLAzimuth.AutoSize = true;
-            this.LBLAzimuth.Location = new System.Drawing.Point(16, 93);
+            this.LBLAzimuth.Location = new System.Drawing.Point(16, 113);
             this.LBLAzimuth.Name = "LBLAzimuth";
             this.LBLAzimuth.Size = new System.Drawing.Size(113, 13);
             this.LBLAzimuth.TabIndex = 5;
@@ -119,7 +120,7 @@ namespace ASCOM.GowerCDome
             // 
             this.comboBoxComPort.DropDownWidth = 90;
             this.comboBoxComPort.FormattingEnabled = true;
-            this.comboBoxComPort.Location = new System.Drawing.Point(258, 91);
+            this.comboBoxComPort.Location = new System.Drawing.Point(258, 111);
             this.comboBoxComPort.Name = "comboBoxComPort";
             this.comboBoxComPort.Size = new System.Drawing.Size(90, 21);
             this.comboBoxComPort.TabIndex = 7;
@@ -129,7 +130,7 @@ namespace ASCOM.GowerCDome
             // LBLStepper
             // 
             this.LBLStepper.AutoSize = true;
-            this.LBLStepper.Location = new System.Drawing.Point(16, 141);
+            this.LBLStepper.Location = new System.Drawing.Point(16, 138);
             this.LBLStepper.Name = "LBLStepper";
             this.LBLStepper.Size = new System.Drawing.Size(119, 13);
             this.LBLStepper.TabIndex = 8;
@@ -138,7 +139,7 @@ namespace ASCOM.GowerCDome
             // comboBoxComPortStepper
             // 
             this.comboBoxComPortStepper.FormattingEnabled = true;
-            this.comboBoxComPortStepper.Location = new System.Drawing.Point(259, 141);
+            this.comboBoxComPortStepper.Location = new System.Drawing.Point(259, 138);
             this.comboBoxComPortStepper.Name = "comboBoxComPortStepper";
             this.comboBoxComPortStepper.Size = new System.Drawing.Size(88, 21);
             this.comboBoxComPortStepper.TabIndex = 9;
@@ -180,7 +181,7 @@ namespace ASCOM.GowerCDome
             // LBLShutter
             // 
             this.LBLShutter.AutoSize = true;
-            this.LBLShutter.Location = new System.Drawing.Point(16, 119);
+            this.LBLShutter.Location = new System.Drawing.Point(16, 87);
             this.LBLShutter.Name = "LBLShutter";
             this.LBLShutter.Size = new System.Drawing.Size(117, 13);
             this.LBLShutter.TabIndex = 12;
@@ -189,7 +190,7 @@ namespace ASCOM.GowerCDome
             // comboBoxComPortShutter
             // 
             this.comboBoxComPortShutter.FormattingEnabled = true;
-            this.comboBoxComPortShutter.Location = new System.Drawing.Point(259, 116);
+            this.comboBoxComPortShutter.Location = new System.Drawing.Point(259, 84);
             this.comboBoxComPortShutter.Name = "comboBoxComPortShutter";
             this.comboBoxComPortShutter.Size = new System.Drawing.Size(88, 21);
             this.comboBoxComPortShutter.TabIndex = 13;

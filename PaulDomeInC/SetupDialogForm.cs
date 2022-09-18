@@ -261,23 +261,48 @@ namespace ASCOM.GowerCDome
 
             //now send id messages to each port in the list to find which MCU is attached to which port.
             label1.Text= "Please wait while ID takes place";
-            label1.Text = "Please wait while ID takes place";
+            label1.TextAlign = ContentAlignment.MiddleCenter;
+            
+            label1.BackColor = Color.OrangeRed;
             label1.Refresh();
             try
             {
+                LBLShutter.BackColor = Color.DarkGray;
+                LBLAzimuth.BackColor = Color.DarkGray;
+                LBLStepper.BackColor = Color.DarkGray;
+                LBLShutter.Refresh();
+                LBLAzimuth.Refresh();
+                LBLStepper.Refresh();
 
-                string portName;
+                LBLShutter.Text = "Shutter id in process....";
+                LBLShutter.Refresh();
+
+                string portName;                                                 //used to hold the name of the com port returned by portfinder()
+
                 portName = portFinder(tempPort, "shutter#", portlist);          // this routine returns the port name that replied e.g. COM7
-
                 LBLShutter.Text = checkForNull(portName, "Shutter");
+                LBLShutter.BackColor = Color.YellowGreen;
+                LBLShutter.Refresh();
                 portlist.Remove(portName);                                      // remove from the portlist to reduce the list size and future processing time
+
+
+                
+                LBLAzimuth.Text = "Azimuth id in process....";
+                LBLAzimuth.Refresh();
 
                 portName = portFinder(tempPort, "azimuth#", portlist);
                 LBLAzimuth.Text = checkForNull(portName, "Azimuth encoder");
+                LBLAzimuth.BackColor = Color.YellowGreen;
+                LBLAzimuth.Refresh();
                 portlist.Remove(portName);
 
                 portName = portFinder(tempPort, "stepper#", portlist);
+                
+                LBLStepper.Text = "Dome drive id in process....";
+                LBLStepper.Refresh();
+
                 LBLStepper.Text = checkForNull(portName, "Dome drive");
+                LBLStepper.BackColor = Color.YellowGreen;
             }
 
             catch (Exception ex)
@@ -288,7 +313,8 @@ namespace ASCOM.GowerCDome
 
 
             label1.Text = " Port Identification complete, click OK when done";
-
+            label1.BackColor = Color.YellowGreen;
+            label1.TextAlign = ContentAlignment.MiddleCenter;
 
         }
     }  // end public partial class
