@@ -44,6 +44,7 @@ namespace ASCOM.GowerCDome
             this.numericUpDownHomeAzimuth = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
             this.btnApply = new System.Windows.Forms.Button();
+            this.BTNidcomports = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownParkAzimuth)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownHomeAzimuth)).BeginInit();
@@ -53,7 +54,7 @@ namespace ASCOM.GowerCDome
             // 
             this.cmdOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cmdOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.cmdOK.Location = new System.Drawing.Point(357, 239);
+            this.cmdOK.Location = new System.Drawing.Point(465, 239);
             this.cmdOK.Name = "cmdOK";
             this.cmdOK.Size = new System.Drawing.Size(59, 24);
             this.cmdOK.TabIndex = 0;
@@ -65,7 +66,7 @@ namespace ASCOM.GowerCDome
             // 
             this.cmdCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cmdCancel.Location = new System.Drawing.Point(357, 269);
+            this.cmdCancel.Location = new System.Drawing.Point(465, 269);
             this.cmdCancel.Name = "cmdCancel";
             this.cmdCancel.Size = new System.Drawing.Size(59, 25);
             this.cmdCancel.TabIndex = 1;
@@ -77,7 +78,7 @@ namespace ASCOM.GowerCDome
             // 
             this.label1.Location = new System.Drawing.Point(12, 34);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(143, 31);
+            this.label1.Size = new System.Drawing.Size(143, 41);
             this.label1.TabIndex = 2;
             this.label1.Text = "Driver settings for Azimuth and stepper ports.";
             // 
@@ -86,7 +87,7 @@ namespace ASCOM.GowerCDome
             this.picASCOM.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.picASCOM.Cursor = System.Windows.Forms.Cursors.Hand;
             this.picASCOM.Image = global::ASCOM.GowerCDome.Properties.Resources.ASCOM;
-            this.picASCOM.Location = new System.Drawing.Point(368, 9);
+            this.picASCOM.Location = new System.Drawing.Point(476, 9);
             this.picASCOM.Name = "picASCOM";
             this.picASCOM.Size = new System.Drawing.Size(48, 56);
             this.picASCOM.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
@@ -229,7 +230,7 @@ namespace ASCOM.GowerCDome
             // 
             // btnApply
             // 
-            this.btnApply.Location = new System.Drawing.Point(355, 205);
+            this.btnApply.Location = new System.Drawing.Point(464, 204);
             this.btnApply.Name = "btnApply";
             this.btnApply.Size = new System.Drawing.Size(60, 29);
             this.btnApply.TabIndex = 16;
@@ -237,11 +238,22 @@ namespace ASCOM.GowerCDome
             this.btnApply.UseVisualStyleBackColor = true;
             this.btnApply.Click += new System.EventHandler(this.btnApply_Click);
             // 
+            // BTNidcomports
+            // 
+            this.BTNidcomports.Location = new System.Drawing.Point(409, 129);
+            this.BTNidcomports.Name = "BTNidcomports";
+            this.BTNidcomports.Size = new System.Drawing.Size(114, 57);
+            this.BTNidcomports.TabIndex = 17;
+            this.BTNidcomports.Text = "Identify COM Ports";
+            this.BTNidcomports.UseVisualStyleBackColor = true;
+            this.BTNidcomports.Click += new System.EventHandler(this.BTNidcomports_Click);
+            // 
             // SetupDialogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(426, 302);
+            this.ClientSize = new System.Drawing.Size(534, 302);
+            this.Controls.Add(this.BTNidcomports);
             this.Controls.Add(this.btnApply);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.numericUpDownHomeAzimuth);
@@ -291,5 +303,6 @@ namespace ASCOM.GowerCDome
         private System.Windows.Forms.NumericUpDown numericUpDownHomeAzimuth;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button btnApply;
+        private System.Windows.Forms.Button BTNidcomports;
     }
 }

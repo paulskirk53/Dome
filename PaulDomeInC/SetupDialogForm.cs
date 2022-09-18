@@ -106,37 +106,6 @@ namespace ASCOM.GowerCDome
 
  
 
- 
-            ASCOM.Utilities.Serial tempPort = new ASCOM.Utilities.Serial();     // setup a variable as an ascom utils serial object
-
-            var portlist = new List<string>(tempPort.AvailableCOMPorts);         // create a list of available comports on tempPort
-            portlist.Remove("COM1");                                             // COM1 is never used by MCUs
-
-        //now send id messages to each port in the list to find which MCU is attached to which port.
-
-            try
-            {
-                
-                string portName;
-                portName = portFinder(tempPort, "shutter#", portlist);          // this routine returns the port name that replied e.g. COM7
-                
-                LBLShutter.Text = checkForNull(portName, "Shutter");
-                portlist.Remove(portName);                                      // remove from the portlist to reduce the list size and future processing time
-
-                portName = portFinder(tempPort, "azimuth#", portlist);
-                LBLAzimuth.Text = checkForNull(portName, "Azimuth encoder");
-                portlist.Remove(portName);
-
-                portName = portFinder(tempPort, "stepper#", portlist);
-                LBLStepper.Text = checkForNull(portName, "Dome drive");
-            }
-
-            catch (Exception ex)
-            {
-                
-                MessageBox.Show(" connection failed. Check the MCUs are on, connected, and in receive mode." + ex.Message);
-            }
-
 
 
 
@@ -277,6 +246,50 @@ namespace ASCOM.GowerCDome
             myGlobals.check2 = true;
             myGlobals.check3 = true;
             overallCheck();
+        }
+
+        private void BTNidcomports_Click(object sender, EventArgs e)
+        {
+
+
+
+
+            ASCOM.Utilities.Serial tempPort = new ASCOM.Utilities.Serial();     // setup a variable as an ascom utils serial object
+
+            var portlist = new List<string>(tempPort.AvailableCOMPorts);         // create a list of available comports on tempPort
+            portlist.Remove("COM1");                                             // COM1 is never used by MCUs
+
+            //now send id messages to each port in the list to find which MCU is attached to which port.
+            label1.Text= "Please wait while ID takes place";
+            label1.Text = "Please wait while ID takes place";
+            label1.Refresh();
+            try
+            {
+
+                string portName;
+                portName = portFinder(tempPort, "shutter#", portlist);          // this routine returns the port name that replied e.g. COM7
+
+                LBLShutter.Text = checkForNull(portName, "Shutter");
+                portlist.Remove(portName);                                      // remove from the portlist to reduce the list size and future processing time
+
+                portName = portFinder(tempPort, "azimuth#", portlist);
+                LBLAzimuth.Text = checkForNull(portName, "Azimuth encoder");
+                portlist.Remove(portName);
+
+                portName = portFinder(tempPort, "stepper#", portlist);
+                LBLStepper.Text = checkForNull(portName, "Dome drive");
+            }
+
+            catch (Exception ex)
+            {
+
+                MessageBox.Show(" connection failed. Check the MCUs are on, connected, and in receive mode." + ex.Message);
+            }
+
+
+            label1.Text = " Port Identification complete, click OK when done";
+
+
         }
     }  // end public partial class
 
