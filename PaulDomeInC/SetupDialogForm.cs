@@ -281,7 +281,18 @@ namespace ASCOM.GowerCDome
 
                 portName = portFinder(tempPort, "shutter#", portlist);          // this routine returns the port name that replied e.g. COM7
                 LBLShutter.Text = checkForNull(portName, "Shutter");
-                LBLShutter.BackColor = Color.YellowGreen;
+
+                // check if port is unavailable and if so set the back colour to ornage
+                if (LBLShutter.Text.Contains("Unavailable"))
+                {
+                    LBLShutter.BackColor = Color.Orange;
+                }
+                else
+                {
+                    LBLShutter.BackColor = Color.YellowGreen;
+
+                }
+
                 LBLShutter.Refresh();
                 portlist.Remove(portName);                                      // remove from the portlist to reduce the list size and future processing time
 
@@ -292,7 +303,18 @@ namespace ASCOM.GowerCDome
 
                 portName = portFinder(tempPort, "azimuth#", portlist);
                 LBLAzimuth.Text = checkForNull(portName, "Azimuth encoder");
-                LBLAzimuth.BackColor = Color.YellowGreen;
+                
+                // check if port is unavailable and if so set the back colour to ornage
+                if (LBLAzimuth.Text.Contains("Unavailable"))
+                {
+                    LBLAzimuth.BackColor = Color.Orange;
+                }
+                else
+                {
+                    
+                    LBLAzimuth.BackColor = Color.YellowGreen;
+                }
+
                 LBLAzimuth.Refresh();
                 portlist.Remove(portName);
 
@@ -302,7 +324,16 @@ namespace ASCOM.GowerCDome
                 LBLStepper.Refresh();
 
                 LBLStepper.Text = checkForNull(portName, "Dome drive");
-                LBLStepper.BackColor = Color.YellowGreen;
+
+                // check if port is unavailable and if so set the back colour to ornage
+                if (LBLStepper.Text.Contains("Unavailable") )
+                    {
+                    LBLStepper.BackColor = Color.Orange;
+                    }
+                else
+                   {
+                    LBLStepper.BackColor = Color.YellowGreen;
+                }
             }
 
             catch (Exception ex)
