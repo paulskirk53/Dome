@@ -259,6 +259,26 @@ namespace ASCOM.GowerCDome
             var portlist = new List<string>(tempPort.AvailableCOMPorts);         // create a list of available comports on tempPort
             portlist.Remove("COM1");                                             // COM1 is never used by MCUs
 
+
+            //write some code to try to connect to the ports and if that fails, the port is busy, so remove it from the list..
+
+            foreach(var port in portlist)
+            {
+                try
+                {
+                    tempPort.PortName = port;
+                    tempPort.Connected = true;
+                    tempPort.Connected = false;
+                }
+                catch
+                {
+                    // if we get here connection failed, so remoe thport from the list
+                    portlist.Remove(port);
+                }
+            }    // end foreach
+
+            portlist.ToArray();
+
             //now send id messages to each port in the list to find which MCU is attached to which port.
             label1.Text= "Please wait while ID takes place";
             label1.TextAlign = ContentAlignment.MiddleCenter;
