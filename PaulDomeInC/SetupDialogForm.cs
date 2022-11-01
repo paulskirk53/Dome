@@ -250,7 +250,8 @@ namespace ASCOM.GowerCDome
 
         private void BTNidcomports_Click(object sender, EventArgs e)
         {
-
+            BTNidcomports.Text = "Waiting for ID";
+            BTNidcomports.Refresh();
 
 
 
@@ -262,7 +263,7 @@ namespace ASCOM.GowerCDome
 
             //write some code to try to connect to the ports and if that fails, the port is busy, so remove it from the list..
 
-            foreach(var port in portlist)
+            foreach (string port in portlist)
             {
                 try
                 {
@@ -363,11 +364,15 @@ namespace ASCOM.GowerCDome
             }
 
 
-            label1.Text = " Port Identification complete, click OK when done";
+            label1.Text = " Port Identification complete";
             label1.BackColor = Color.YellowGreen;
             label1.TextAlign = ContentAlignment.MiddleCenter;
 
-        }
+            //reset the command button text
+            BTNidcomports.Text = "Identify Comports";
+
+        }  // end id comports
+
     }  // end public partial class
 
     public static class myGlobals     // this is a way of making a global variable set, accessible fom anywhere in the namespace. It's used to determine if all the com ports have been selected.
