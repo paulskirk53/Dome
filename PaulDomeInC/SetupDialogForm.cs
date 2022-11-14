@@ -258,6 +258,7 @@ namespace ASCOM.GowerCDome
             ASCOM.Utilities.Serial tempPort = new ASCOM.Utilities.Serial();     // setup a variable as an ascom utils serial object
 
             var portlist = new List<string>(tempPort.AvailableCOMPorts);         // create a list of available comports on tempPort
+            var busyPorts = new List<string>();
             portlist.Remove("COM1");                                             // COM1 is never used by MCUs
 
 
@@ -270,13 +271,21 @@ namespace ASCOM.GowerCDome
                     tempPort.PortName = port;
                     tempPort.Connected = true;
                     tempPort.Connected = false;
+                  //  MessageBox.Show("Try port " + port);
                 }
                 catch
                 {
                     // if we get here connection failed, so remoe thport from the list
-                    portlist.Remove(port);
+                    busyPorts.Add(port);
+                   // MessageBox.Show("Catch port to remove " + port);
                 }
             }    // end foreach
+
+            //now remove the busy ports from the port list
+            foreach (string port in busyPorts)
+            {
+                portlist.Remove(port);
+            }
 
             portlist.ToArray();
 
