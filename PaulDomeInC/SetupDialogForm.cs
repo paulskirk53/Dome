@@ -348,7 +348,7 @@ namespace ASCOM.GowerCDome
                // LBLAzimuth.Refresh();
                 portlist.Remove(portName);
 
-                portName = portFinder(tempPort, "stepper#", portlist);
+                portName = portFinder(tempPort, "controlbox#", portlist);
                 
                 LBLStepper.Text = "Dome drive id in process....";
                 LBLStepper.Refresh();
