@@ -4,7 +4,7 @@
 //
 // ASCOM Dome driver for GowerCDome
 //
-// Description:	Part one - THIS IS THE WORKING PROJECT FILE. iT has been tested 
+// Description:	Part one - THIS IS THE changed ascom dome driver which is modded to accmmodate the new one MCU control boxShas been tested 
 //  2022 - we have moved on a lot and my understanding of what's going on is much greater!
 
 //      Code for this revision was initially informd by 'dome driver program process - google sheets url and this is where Tom How helped with the architecture stuff
@@ -18,11 +18,12 @@
 //
 // Date			Who	Vers	Description
 // -----------	---	-----	-------------------------------------------------------
-// 4-3-2017	XXX	6.0.0	Initial edit, created from ASCOM driver template - many edits since, all in github
+// 24-6-2023	XXX	6.0.0	new control box, created from ASCOM driver template - many edits since, all in github
 // --------------------------------------------------------------------------------
 
 // 14-8-17 tested with telescope sim for.net, POTH and C du Ciel - see notes in wordpad file  in folder 'domestuff'
 // 10-3-2022 - five years on....
+// 24-6-2023 - six years on
 
 
 // This is used to define code in the template that is specific to one class implementation
@@ -77,8 +78,8 @@ namespace ASCOM.GowerCDome
         /// </summary>
         private static string driverDescription              = "ASCOM Gower Observatory 2017.";
         internal static string comPortProfileName            = "COM Port"; // Constants used for Profile persistence
-        internal static string StepperPortProfileName        = "Stepper Port";
-        internal static string CompassEncoderPortProfileName = "Encoder Port";
+        internal static string control_BoxPortProfileName    = "Control Box Port";
+       
         internal static string ShutterPortProfileName        = "Shutter Port";
         internal static string SetParkProfilename            = "Set Park";
         internal static string SetHomeProfilename            = "Set Home";
@@ -86,8 +87,8 @@ namespace ASCOM.GowerCDome
         internal static string traceStateProfileName         = "Trace Level";
         internal static string traceStateDefault             = "false";
         internal static string comPort;                  // Variables to hold the currrent device configuration
-        internal static string CompassComPort;          // PK ADDED THESE ...
-        internal static string StepperComPort;
+      
+        internal static string control_BoxComPort;
         internal static string ShutterComPort;
         internal static string Parkplace;
         internal static string Homeplace;
@@ -114,8 +115,8 @@ namespace ASCOM.GowerCDome
         /// </summary>
         internal static TraceLogger tl;
 
-        private ASCOM.Utilities.Serial pkstepper;
-        private ASCOM.Utilities.Serial pkcompass;
+        private ASCOM.Utilities.Serial control_Box;
+   
         private ASCOM.Utilities.Serial pkShutter;
 
         /// <summary>
@@ -252,14 +253,14 @@ namespace ASCOM.GowerCDome
 
         private bool Connect()
         {
-            tl.LogMessage("Connected Set", "Connecting to port " + StepperComPort );
-            //set the stepper motor connection
+            tl.LogMessage("Connected Set", "Connecting to port " + control_BoxComPort );
+            //set the control_Box motor connection
             try
             {
-                pkstepper = OpenPort(StepperComPort);
+                control_Box = OpenPort(control_BoxComPort);
 
-                // set the compass (now encoder) connection
-                pkcompass = OpenPort(CompassComPort);
+                // set the control box connection
+                control_Box = OpenPort(control_BoxComPort);
                 pkShutter = OpenPort(ShutterComPort);
 
                 return true;    //pk added cos of build error not all code paths return a value
@@ -268,14 +269,14 @@ namespace ASCOM.GowerCDome
             {
                 tl.LogMessage("Connected Set", "Unable to connect to COM ports " + ex.ToString());
 
-                if (pkstepper != null)
+                if (control_Box != null)
                 {
-                    DisconnectPort(pkstepper);
+                    DisconnectPort(control_Box);
                 }
                 
-                if (pkcompass != null)
+                if (control_Box != null)
                 {
-                    DisconnectPort(pkcompass);
+                    DisconnectPort(control_Box);
                 }
                 if (pkShutter != null)
                 {
@@ -288,24 +289,24 @@ namespace ASCOM.GowerCDome
            
         }
 
-        private void initialise_stepper()
+        private void initialise_stepper()   //todo change to control_Box
         {
             double AzimuthInitialise = 261.00;
 
             try
             {
-                pkstepper.ClearBuffers();
+                control_Box.ClearBuffers();
 
-                pkstepper.Transmit("SA" + AzimuthInitialise.ToString("0.##") + "#");
+                control_Box.Transmit("SA" + AzimuthInitialise.ToString("0.##") + "#");
             }
             catch (Exception ex)
             {
 
-                pkstepper.ClearBuffers();
+                control_Box.ClearBuffers();
 
-                pkstepper.Transmit("SA" + AzimuthInitialise.ToString("0.##") + "#");
+                control_Box.Transmit("SA" + AzimuthInitialise.ToString("0.##") + "#");
                 // log
-                tl.LogMessage("Attempt to initialise azimuth for the stepper", ex.ToString());
+                tl.LogMessage("Attempt to initialise azimuth for the control box", ex.ToString());
             }
 
         }
@@ -328,8 +329,8 @@ namespace ASCOM.GowerCDome
         private void Disconnect()
         {
             // disconnect the hardware
-            DisconnectPort(pkstepper);
-            DisconnectPort(pkcompass);
+            DisconnectPort(control_Box);
+            
             DisconnectPort(pkShutter);
             //           tl.LogMessage("Connected Set", "Disconnecting from port " + comPort);
         }
@@ -478,19 +479,19 @@ namespace ASCOM.GowerCDome
 
                     try
                     {
-                        pkcompass.ClearBuffers();
-                 //       pkcompass.Transmit("AZ#");     //NEW 14-1-20
-                        pkcompass.Transmit("AZ#");
+                        control_Box.ClearBuffers();
+                 
+                        control_Box.Transmit("AZ#");
 
                     }
                     catch (Exception ex)
                     {
                         tl.LogMessage("Azimuth property failure to Tx AZ#", ex.ToString());
-                        pkcompass.Transmit("AZ#");
+                        control_Box.Transmit("AZ#");
                     }
 
 
-                    string response = pkcompass.ReceiveTerminated("#");
+                    string response = control_Box.ReceiveTerminated("#");
                     response = response.Replace("#", "");
                     
                     success = double.TryParse(response, out az);
@@ -603,16 +604,16 @@ namespace ASCOM.GowerCDome
 
             try
             {
-                pkstepper.ClearBuffers();
+                control_Box.ClearBuffers();
 
-                pkstepper.Transmit("FH#");
+                control_Box.Transmit("FH#");
             }
             catch (Exception ex)
             {
 
-                pkstepper.ClearBuffers();
+                control_Box.ClearBuffers();
 
-                pkstepper.Transmit("FH#");
+                control_Box.Transmit("FH#");
                 // log
                 tl.LogMessage("Find home ", ex.ToString());
             }
@@ -760,16 +761,16 @@ namespace ASCOM.GowerCDome
  
                 try
                 {
-                    pkstepper.ClearBuffers();
-    
-                    pkstepper.Transmit("SA" + TargetAzimuth.ToString("0.##") + "#");
+                  control_Box.ClearBuffers();
+
+                  control_Box.Transmit("SA" + TargetAzimuth.ToString("0.##") + "#");
                 }
                 catch (Exception ex)
                 {
 
-                    pkstepper.ClearBuffers();
-    
-                    pkstepper.Transmit("SA" + TargetAzimuth.ToString("0.##") + "#");
+                  control_Box.ClearBuffers();
+
+                  control_Box.Transmit("SA" + TargetAzimuth.ToString("0.##") + "#");
                     // log
                     tl.LogMessage("Slew to azimuth - attempt to send CL and SA for angle > 180", ex.ToString());
                 }
@@ -783,20 +784,20 @@ namespace ASCOM.GowerCDome
             {         
                 try
                 {
-                    pkstepper.ClearBuffers();                                         // this cured the receive problem from Arduino             
- 
-                    pkstepper.Transmit("SL#");                 //  accommodates the SL process in the stepper arduino
+                    control_Box.ClearBuffers();                                         // this cured the receive problem from Arduino             
+
+                    control_Box.Transmit("SL#");                 //  accommodates the SL process in the stepper arduino
                 }
                 catch (Exception ex)
                 {
-                    pkstepper.ClearBuffers();
-        
-                    pkstepper.Transmit("SL#");
+                    control_Box.ClearBuffers();
+
+                    control_Box.Transmit("SL#");
                     // log failure
                     tl.LogMessage("Slewing Get failed to Tx SL#", ex.ToString());
                 }
 
-                string SL_response = pkstepper.ReceiveTerminated("#");            // read what's sent back
+                string SL_response = control_Box.ReceiveTerminated("#");            // read what's sent back
                 SL_response = SL_response.Replace("#", "");                       // remove the # mark
                 if (SL_response == "Moving")                                      // set this condition properly
                 {
@@ -814,7 +815,7 @@ namespace ASCOM.GowerCDome
             tl.LogMessage("SyncToAzimuth", "Now implemented");
             //throw new ASCOM.MethodNotImplementedException("SyncToAzimuth");
             String AzimuthString = Azimuth.ToString("0.##");
-            pkcompass.Transmit("STA" + AzimuthString +"#");
+            control_Box.Transmit("STA" + AzimuthString +"#");
         }
 
         #endregion
@@ -933,8 +934,7 @@ namespace ASCOM.GowerCDome
                 driverProfile.DeviceType = "Dome";
                 tl.Enabled = Convert.ToBoolean(driverProfile.GetValue(driverID, traceStateProfileName, string.Empty, traceStateDefault));
 
-                CompassComPort = driverProfile.GetValue(driverID, CompassEncoderPortProfileName, string.Empty, CompassComPort);
-                StepperComPort = driverProfile.GetValue(driverID, StepperPortProfileName, string.Empty, StepperComPort);
+                control_BoxComPort = driverProfile.GetValue(driverID,  control_BoxPortProfileName, string.Empty, control_BoxComPort);
                 ShutterComPort = driverProfile.GetValue(driverID, ShutterPortProfileName, string.Empty, ShutterComPort);
                 temp           = driverProfile.GetValue(driverID, SetParkProfilename, string.Empty, Parkplace);   //pk changed to add in string.Empty, as with the other lines here
                 double.TryParse(temp, out ParkAzimuth);   // this line sets the initial value of ParkAzimuth
@@ -956,8 +956,7 @@ namespace ASCOM.GowerCDome
                 driverProfile.DeviceType = "Dome";
                 driverProfile.WriteValue(driverID, traceStateProfileName, tl.Enabled.ToString());
                 
-                driverProfile.WriteValue(driverID, StepperPortProfileName, StepperComPort.ToString());
-                driverProfile.WriteValue(driverID, CompassEncoderPortProfileName, CompassComPort.ToString());
+                driverProfile.WriteValue(driverID, control_BoxPortProfileName, control_BoxComPort.ToString());
                 driverProfile.WriteValue(driverID, ShutterPortProfileName, ShutterComPort.ToString());
                 driverProfile.WriteValue(driverID, SetParkProfilename, Parkplace.ToString());
                 driverProfile.WriteValue(driverID, SetHomeProfilename, Homeplace.ToString());

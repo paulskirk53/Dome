@@ -32,11 +32,9 @@ namespace ASCOM.GowerCDome
             this.cmdCancel = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.picASCOM = new System.Windows.Forms.PictureBox();
-            this.LBLAzimuth = new System.Windows.Forms.Label();
             this.chkTrace = new System.Windows.Forms.CheckBox();
-            this.comboBoxComPort = new System.Windows.Forms.ComboBox();
             this.LBLStepper = new System.Windows.Forms.Label();
-            this.comboBoxComPortStepper = new System.Windows.Forms.ComboBox();
+            this.comboboxcontrol_box = new System.Windows.Forms.ComboBox();
             this.numericUpDownParkAzimuth = new System.Windows.Forms.NumericUpDown();
             this.lblparkazimuth = new System.Windows.Forms.Label();
             this.LBLShutter = new System.Windows.Forms.Label();
@@ -97,15 +95,6 @@ namespace ASCOM.GowerCDome
             this.picASCOM.Click += new System.EventHandler(this.BrowseToAscom);
             this.picASCOM.DoubleClick += new System.EventHandler(this.BrowseToAscom);
             // 
-            // LBLAzimuth
-            // 
-            this.LBLAzimuth.AutoSize = true;
-            this.LBLAzimuth.Location = new System.Drawing.Point(16, 113);
-            this.LBLAzimuth.Name = "LBLAzimuth";
-            this.LBLAzimuth.Size = new System.Drawing.Size(113, 13);
-            this.LBLAzimuth.TabIndex = 5;
-            this.LBLAzimuth.Text = "Az Encoder on            ";
-            // 
             // chkTrace
             // 
             this.chkTrace.AutoSize = true;
@@ -116,17 +105,6 @@ namespace ASCOM.GowerCDome
             this.chkTrace.Text = "Trace on";
             this.chkTrace.UseVisualStyleBackColor = true;
             // 
-            // comboBoxComPort
-            // 
-            this.comboBoxComPort.DropDownWidth = 90;
-            this.comboBoxComPort.FormattingEnabled = true;
-            this.comboBoxComPort.Location = new System.Drawing.Point(258, 111);
-            this.comboBoxComPort.Name = "comboBoxComPort";
-            this.comboBoxComPort.Size = new System.Drawing.Size(90, 21);
-            this.comboBoxComPort.TabIndex = 7;
-            this.comboBoxComPort.Text = " Choose Port";
-            this.comboBoxComPort.SelectionChangeCommitted += new System.EventHandler(this.comboBoxComPort_SelectionChangeCommitted);
-            // 
             // LBLStepper
             // 
             this.LBLStepper.AutoSize = true;
@@ -136,15 +114,14 @@ namespace ASCOM.GowerCDome
             this.LBLStepper.TabIndex = 8;
             this.LBLStepper.Text = "Dome drive Control Box  on ";
             // 
-            // comboBoxComPortStepper
+            // comboboxcontrol_box
             // 
-            this.comboBoxComPortStepper.FormattingEnabled = true;
-            this.comboBoxComPortStepper.Location = new System.Drawing.Point(259, 138);
-            this.comboBoxComPortStepper.Name = "comboBoxComPortStepper";
-            this.comboBoxComPortStepper.Size = new System.Drawing.Size(88, 21);
-            this.comboBoxComPortStepper.TabIndex = 9;
-            this.comboBoxComPortStepper.Text = "Choose Port";
-            this.comboBoxComPortStepper.SelectionChangeCommitted += new System.EventHandler(this.comboBoxComPortStepper_SelectionChangeCommitted);
+            this.comboboxcontrol_box.FormattingEnabled = true;
+            this.comboboxcontrol_box.Location = new System.Drawing.Point(259, 138);
+            this.comboboxcontrol_box.Name = "comboboxcontrol_box";
+            this.comboboxcontrol_box.Size = new System.Drawing.Size(88, 21);
+            this.comboboxcontrol_box.TabIndex = 9;
+            this.comboboxcontrol_box.Text = "Choose Port";
             // 
             // numericUpDownParkAzimuth
             // 
@@ -262,11 +239,9 @@ namespace ASCOM.GowerCDome
             this.Controls.Add(this.LBLShutter);
             this.Controls.Add(this.lblparkazimuth);
             this.Controls.Add(this.numericUpDownParkAzimuth);
-            this.Controls.Add(this.comboBoxComPortStepper);
+            this.Controls.Add(this.comboboxcontrol_box);
             this.Controls.Add(this.LBLStepper);
-            this.Controls.Add(this.comboBoxComPort);
             this.Controls.Add(this.chkTrace);
-            this.Controls.Add(this.LBLAzimuth);
             this.Controls.Add(this.picASCOM);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.cmdCancel);
@@ -292,11 +267,9 @@ namespace ASCOM.GowerCDome
         private System.Windows.Forms.Button cmdCancel;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.PictureBox picASCOM;
-        private System.Windows.Forms.Label LBLAzimuth;
         private System.Windows.Forms.CheckBox chkTrace;
-        private System.Windows.Forms.ComboBox comboBoxComPort;
         private System.Windows.Forms.Label LBLStepper;
-        private System.Windows.Forms.ComboBox comboBoxComPortStepper;
+        private System.Windows.Forms.ComboBox comboboxcontrol_box;
         private System.Windows.Forms.NumericUpDown numericUpDownParkAzimuth;
         private System.Windows.Forms.Label lblparkazimuth;
         private System.Windows.Forms.Label LBLShutter;

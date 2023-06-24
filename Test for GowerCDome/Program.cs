@@ -42,81 +42,8 @@ namespace ASCOM
                       // TODO add more code to test the driver.
           
 
-            // trying to display the setup dialog....
-
-            // device.SetupDialog();
-
-            /*
-            int difference = 0;
-            int diffmod = 0;
-            int divider = 360;
-            double taz = 350.0;
-            double caz = 20.0;
-            String direction = "";
-            int part1, part2, part3;
-
-            //Console.Write("New Target Azimuth value ? a number > 360 exits the routine :");
-
-            while (taz < 361.0)
-            {
-
-                
-                Console.Write("New Target Azimuth value ? a number > 360 exits the routine :");                            // invite user input for azimuth tests
-
-                String response = Console.ReadLine();
-
-                if (double.TryParse(response, out taz))
-
-                    Console.Write("New Current Azimuth value ? a number > 360 exits the routine :");                            // invite user input for azimuth tests
-
-                 response = Console.ReadLine();
-
-                if (double.TryParse(response, out caz))
-
-                difference = (int)(caz - taz);
-                                                               //difference = Math.Abs(difference);
-                part1 = (int)(difference/360);
-                if (difference<0)
-                {
-                    part1 = -1;
-                }
-                part2 = part1 * 360;
-                part3 = difference - part2;
-
-                Console.WriteLine("difference   =   " + difference);
-                Console.WriteLine("part1        =   " + part1);
-                Console.WriteLine("part2        =   " + part2);
-                Console.WriteLine("part3        =   " + part3);
-               
-                for (int i =1; i<500; i++)
-                {
-                    difference = difference - 360;
-                    if (difference < 360)
-                    {
-                        break;
-                    }
-                  
-                }
-                
-
-                diffmod = part3;
-
-                if (diffmod >= 180)
-                {
-                     direction = "CL";
-                }
-                else
-                {
-                    direction = "CC";
-                }
-
-                Console.WriteLine("diffmod   =   " + diffmod);
-                Console.WriteLine("direction =   " + direction);
-
-            }
-
-            */
-             device.Connected = true;
+            
+           device.Connected = true;
 
             
 

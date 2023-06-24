@@ -31,10 +31,10 @@ namespace ASCOM.GowerCDome
             
             // Place any validation constraint checks here
             // Update the state variables with results from the dialogue
-            Dome.comPort = (string)comboBoxComPort.SelectedItem;
+         //   Dome.comPort = (string)comboBoxComPort.SelectedItem;
             Dome.tl.Enabled = chkTrace.Checked;
-            Dome.CompassComPort = (string)comboBoxComPort.SelectedItem;          //user selected port for compass
-            Dome.StepperComPort = (string)comboBoxComPortStepper.SelectedItem;   //user selected port for stepper
+          //  Dome.CompassComPort = (string)comboBoxComPort.SelectedItem;          //user selected port for compass
+            Dome.control_BoxComPort = (string)comboboxcontrol_box.SelectedItem;   //user selected port for stepper
             Dome.ShutterComPort = (string)comboBoxComPortShutter.SelectedItem;   //user selected port for stepper
             Dome.Parkplace = numericUpDownParkAzimuth.Value.ToString();
             Dome.Homeplace = numericUpDownHomeAzimuth.Value.ToString();
@@ -78,26 +78,26 @@ namespace ASCOM.GowerCDome
 
             chkTrace.Checked = Dome.tl.Enabled;
             // set the list of com ports to those that are currently available
-            comboBoxComPort.Items.Clear();        //compass
-            comboBoxComPortStepper.Items.Clear(); //pk code
+           // comboBoxComPort.Items.Clear();        //compass
+            comboboxcontrol_box.Items.Clear(); //pk code
             comboBoxComPortShutter.Items.Clear(); //pk code
-            comboBoxComPort.Items.AddRange(System.IO.Ports.SerialPort.GetPortNames());             // use System.IO because it's static
+            // comboBoxComPort.Items.AddRange(System.IO.Ports.SerialPort.GetPortNames());             // use System.IO because it's static
             comboBoxComPortShutter.Items.AddRange(System.IO.Ports.SerialPort.GetPortNames());      // use System.IO because it's static
-            comboBoxComPortStepper.Items.AddRange(System.IO.Ports.SerialPort.GetPortNames());      // pk code
-            comboBoxComPortStepper.Items.Remove("COM1");                                           //com1 not used by MCU
-            comboBoxComPort.Items.Remove("COM1");
+            comboboxcontrol_box.Items.AddRange(System.IO.Ports.SerialPort.GetPortNames());      // pk code
+            comboboxcontrol_box.Items.Remove("COM1");                                           //com1 not used by MCU
+            // comboBoxComPort.Items.Remove("COM1");
             comboBoxComPortShutter.Items.Remove("COM1");
 
             // select the current port if possible
-            if (comboBoxComPort.Items.Contains(Dome.CompassComPort))   // see the driver code - this is set to a value of 4 - i.e. com4 is default
-            {
-                comboBoxComPort.SelectedItem = Dome.CompassComPort;    // the item that appears in the combobox at form load
-            }
+      //      if (comboBoxComPort.Items.Contains(Dome.CompassComPort))   // see the driver code - this is set to a value of 4 - i.e. com4 is default
+      //      {
+      //          comboBoxComPort.SelectedItem = Dome.CompassComPort;    // the item that appears in the combobox at form load
+      //      }
 
 
-            if (comboBoxComPortStepper.Items.Contains(Dome.StepperComPort))   // see the driver code - this is set in the connected proerty
+            if (comboboxcontrol_box.Items.Contains(Dome.control_BoxComPort ))   // see the driver code - this is set in the connected property
             {
-                comboBoxComPortStepper.SelectedItem = Dome.StepperComPort;    // the item that appears in the combobox at form load
+                comboboxcontrol_box.SelectedItem = Dome.control_BoxComPort;    // the item that appears in the combobox at form load
             }
             if (comboBoxComPortShutter.Items.Contains(Dome.ShutterComPort))   // see the driver code - this is set in the connected proerty
             {
@@ -214,12 +214,12 @@ namespace ASCOM.GowerCDome
 
        
 
-        private void comboBoxComPort_SelectionChangeCommitted(object sender, EventArgs e)   // bad name for the combo - this is the selection change for the azimuth comport
-        {
-            
-            myGlobals.check1 = true;
-            overallCheck();
-        }
+      //  private void comboBoxComPort_SelectionChangeCommitted(object sender, EventArgs e)   // bad name for the combo - this is the selection change for the azimuth comport
+      //  {
+      //      
+      //      myGlobals.check1 = true;
+      //      overallCheck();
+      //  }
 
         private void comboBoxComPortShutter_SelectionChangeCommitted(object sender, EventArgs e)
         {
@@ -227,7 +227,7 @@ namespace ASCOM.GowerCDome
             overallCheck();
         }
 
-        private void comboBoxComPortStepper_SelectionChangeCommitted(object sender, EventArgs e)
+        private void comboboxcontrol_box_SelectionChangeCommitted(object sender, EventArgs e)
         {
             myGlobals.check3 = true;
             overallCheck();
@@ -298,10 +298,10 @@ namespace ASCOM.GowerCDome
             try
             {
                 LBLShutter.BackColor = Color.DarkGray;
-                LBLAzimuth.BackColor = Color.DarkGray;
+                //LBLAzimuth.BackColor = Color.DarkGray;
                 LBLStepper.BackColor = Color.DarkGray;
                 LBLShutter.Refresh();
-                LBLAzimuth.Refresh();
+                //LBLAzimuth.Refresh();
                 LBLStepper.Refresh();
 
                 LBLShutter.Text = "Shutter id in process....";
@@ -328,24 +328,24 @@ namespace ASCOM.GowerCDome
 
 
                 
-                LBLAzimuth.Text = "Azimuth id in process....";
-                LBLAzimuth.Refresh();
+               // LBLAzimuth.Text = "Azimuth id in process....";
+               // LBLAzimuth.Refresh();
 
                 portName = portFinder(tempPort, "azimuth#", portlist);
-                LBLAzimuth.Text = checkForNull(portName, "Azimuth encoder");
+               // LBLAzimuth.Text = checkForNull(portName, "Azimuth encoder");
                 
                 // check if port is unavailable and if so set the back colour to ornage
-                if (LBLAzimuth.Text.Contains("Unavailable"))
-                {
-                    LBLAzimuth.BackColor = Color.Orange;
-                }
-                else
-                {
-                    
-                    LBLAzimuth.BackColor = Color.YellowGreen;
-                }
+               // if (LBLAzimuth.Text.Contains("Unavailable"))
+               // {
+               //     LBLAzimuth.BackColor = Color.Orange;
+               // }
+               // else
+               // {
+               //     
+               //     LBLAzimuth.BackColor = Color.YellowGreen;
+               // }
 
-                LBLAzimuth.Refresh();
+               // LBLAzimuth.Refresh();
                 portlist.Remove(portName);
 
                 portName = portFinder(tempPort, "stepper#", portlist);
