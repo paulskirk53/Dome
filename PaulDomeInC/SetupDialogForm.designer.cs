@@ -132,9 +132,9 @@ namespace ASCOM.GowerCDome
             this.LBLStepper.AutoSize = true;
             this.LBLStepper.Location = new System.Drawing.Point(16, 138);
             this.LBLStepper.Name = "LBLStepper";
-            this.LBLStepper.Size = new System.Drawing.Size(119, 13);
+            this.LBLStepper.Size = new System.Drawing.Size(139, 13);
             this.LBLStepper.TabIndex = 8;
-            this.LBLStepper.Text = "Dome drive Stepper on ";
+            this.LBLStepper.Text = "Dome drive Control Box  on ";
             // 
             // comboBoxComPortStepper
             // 
