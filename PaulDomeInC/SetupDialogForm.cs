@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using ASCOM.Utilities;
 using ASCOM.GowerCDome;
 using System.Threading;
+using System.IO.Ports;
 
 namespace ASCOM.GowerCDome
 {
@@ -33,12 +34,12 @@ namespace ASCOM.GowerCDome
             // Update the state variables with results from the dialogue
          //   Dome.comPort = (string)comboBoxComPort.SelectedItem;
             Dome.tl.Enabled = chkTrace.Checked;
-          //  Dome.CompassComPort = (string)comboBoxComPort.SelectedItem;          //user selected port for compass
-            Dome.control_BoxComPort = (string)comboboxcontrol_box.SelectedItem;   //user selected port for stepper
-            Dome.ShutterComPort = (string)comboBoxComPortShutter.SelectedItem;   //user selected port for stepper
+          
+            Dome.control_BoxComPort = (string)comboboxcontrol_box.SelectedItem;   //user selected port for control box MCU
+            Dome.ShutterComPort = (string)comboBoxComPortShutter.SelectedItem;   //user selected port for shutter mcu
             Dome.Parkplace = numericUpDownParkAzimuth.Value.ToString();
             Dome.Homeplace = numericUpDownHomeAzimuth.Value.ToString();
-          //  System.Windows.Forms.MessageBox.Show(Dome.StepperComPort);            // put in to test -pops up a dialog showing value of comport selected
+          
 
      
 
@@ -81,34 +82,23 @@ namespace ASCOM.GowerCDome
            // comboBoxComPort.Items.Clear();        //compass
             comboboxcontrol_box.Items.Clear(); //pk code
             comboBoxComPortShutter.Items.Clear(); //pk code
-            // comboBoxComPort.Items.AddRange(System.IO.Ports.SerialPort.GetPortNames());             // use System.IO because it's static
-            comboBoxComPortShutter.Items.AddRange(System.IO.Ports.SerialPort.GetPortNames());      // use System.IO because it's static
+            
+            comboBoxComPortShutter.Items.AddRange(System.IO.Ports.SerialPort.GetPortNames());   // use System.IO because it's static
             comboboxcontrol_box.Items.AddRange(System.IO.Ports.SerialPort.GetPortNames());      // pk code
-            comboboxcontrol_box.Items.Remove("COM1");                                           //com1 not used by MCU
-            // comboBoxComPort.Items.Remove("COM1");
+            comboboxcontrol_box.Items.Remove("COM1");                                           // com1 not used by MCU
+            
             comboBoxComPortShutter.Items.Remove("COM1");
 
-            // select the current port if possible
-      //      if (comboBoxComPort.Items.Contains(Dome.CompassComPort))   // see the driver code - this is set to a value of 4 - i.e. com4 is default
-      //      {
-      //          comboBoxComPort.SelectedItem = Dome.CompassComPort;    // the item that appears in the combobox at form load
-      //      }
-
-
             if (comboboxcontrol_box.Items.Contains(Dome.control_BoxComPort ))   // see the driver code - this is set in the connected property
-            {
+              {
                 comboboxcontrol_box.SelectedItem = Dome.control_BoxComPort;    // the item that appears in the combobox at form load
-            }
+              }
             if (comboBoxComPortShutter.Items.Contains(Dome.ShutterComPort))   // see the driver code - this is set in the connected proerty
-            {
+              {
                 comboBoxComPortShutter.SelectedItem = Dome.ShutterComPort;    // the item that appears in the combobox at form load
-            }
+              }
 
  
-
-
-
-
         }
             
 
@@ -125,19 +115,19 @@ namespace ASCOM.GowerCDome
             }
         }
 
-        private string portFinder(ASCOM.Utilities.Serial testPort, string mcuName, List<string> portlist)  //mcuName will be e.g "encoder" or "stepper"
+        private string portFinder(ASCOM.Utilities.Serial testPort, string mcuName, List<string> portlist)  //mcuName will be e.g "controlbox" or "shutter"
         {
             //*
             // * This routine uses a test port to cycle through the portnames (COM1, COM3 etc), checking each port 
-             //*  by sending a string recognised by a particular MCU e.g. stepper# or encoder#
-             //*  if the mcu is on the port, it responds with stepper# or encoder#
+             //*  by sending a string recognised by a particular MCU e.g. controlbox# or shutter#
+             //*  if the mcu is on the port, it responds with controlbox# or shutter#
              //*
             setupThePort(testPort);            //set the parameters for testport - baud etc
             bool found = false;
             foreach (string portName in portlist)     // GetUnusedSerialPorts forms a list of COM ports which are available
             {
                // MessageBox.Show("the port being checked is " + portName);        //tis worked
-                found = checkforMCU(testPort, portName, mcuName);     // this checks if the current portName responds to mcuName (stepper# / emcoder#)
+                found = checkforMCU(testPort, portName, mcuName);     // this checks if the current portName responds to mcuName (controlbox# / shutter#)
                 if (found)
                 {
                   //  MessageBox.Show("the port is found " + portName);
@@ -148,28 +138,71 @@ namespace ASCOM.GowerCDome
 
 
             }
-            return null;                // if no ports respond to queries (e.g. perhaps mcus are not connected), the nukk return is picked by the try - catch exception
-                                        // of encoder connect or stepper connect
+            return null;                // if no ports respond to queries (e.g. perhaps mcus are not connected), the null return is picked by the try - catch exception
+                                        // of control box connect or shutter connect
           //  throw new NullReferenceException();
         }
 
         private bool checkforMCU(ASCOM.Utilities.Serial testPort, string portName, string MCUDescription)
         {
 
-            testPort.PortName = portName;  //                      
+            testPort.PortName = portName;  
+            
             testPort.Connected = true;
             Thread.Sleep(500);           // delay (in mS) - essential if the MCU is Arduino with a bootloader. The Arduino requires time after the port is connected before it can respond to serial requests.
-            
+
             // send data to the MCU and see what comes back
+
+            string response = "";
+
+            //     new below
+/*
+            bool success = false;
+            int n = 0;
+            
+               // MessageBox.Show("Sending " + MCUDescription + " to port " + testPort.PortName);  // + "received " + response);
+                while ((success == false) && (n < 4))
+                {
+                try
+                {
+                    
+                     testPort.Transmit(MCUDescription);                   // transmits controlbox# or shutter# depending upon where called
+                   
+                    response = testPort.ReceiveTerminated("#");          // not all ports respond to a query and those which don't respond will timeout
+                    MessageBox.Show("this is what the MCU received   " + response);
+                }
+                catch
+                {
+                   // MessageBox.Show("Fail iteration " + n);
+                }
+                    
+
+                    if (response == MCUDescription)
+                    {
+                        success = true;
+                        testPort.Connected = false;
+                        return true;
+                     //   break;
+                    }
+                        n++;
+                }  //end while
+
+            */  
+            
+
+       // end new
+
+             //beow is what it used to be prior to 25-6-23
             try
             {
                 
-                // MessageBox.Show("Sending " + MCUDescription + " to port " + portName);
+
+               //  MessageBox.Show("Sending " + MCUDescription + " to port " + portName);
                
-                testPort.Transmit(MCUDescription);                   // transmits encoder# or stepper# depending upon where called
+                testPort.Transmit(MCUDescription);                   // transmits controlbox# or shutter# depending upon where called
                 
             
-                string  response = testPort.ReceiveTerminated("#");   // not all ports respond to a query and those which don't respond will timeout
+                 response = testPort.ReceiveTerminated("#");   // not all ports respond to a query and those which don't respond will timeout
              
                // MessageBox.Show("the response from the MCU " + response);
               
@@ -185,17 +218,81 @@ namespace ASCOM.GowerCDome
                 }
 
                
-               // return false;              // if there was a response it was not the right MCU
             }
             catch (Exception e)     //TimeoutException
             {
 
-                testPort.Connected = false;    // no response
+                  testPort.Connected = false;   
                // MessageBox.Show("the MCU  did not respond to  " + MCUDescription);
             }
+            
+            // star slash
 
+            testPort.Connected = false;
             return false;
         }
+// This is a new namespace in .NET 2.0
+// that contains the SerialPort class
+//using System.IO.Ports;
+
+      private static void SendandReceiveData()
+    {
+        // Instantiate the communications
+        // port with some basic settings
+        SerialPort pkport = new SerialPort(
+          "COM4", 19200, Parity.None, 8, StopBits.One);
+
+           
+
+            // Open the port for communications
+
+            pkport.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
+
+
+            pkport.Open();
+            Thread.Sleep(500);
+
+            // Write a string to the port
+            pkport.Write("shutter#");
+            //Thread.Sleep(500);
+
+            // read from the port
+
+            System.Text.StringBuilder mylist = new System.Text.StringBuilder(" ");  // 11 chars in string
+
+          /* //example ignore mylist[0] = 'C';
+            while (pkport.ReadExisting() != "#" | (mylist.Length<15)  )
+            {
+               
+                mylist.Append( pkport.ReadExisting() );
+            
+            }
+        // Write a set of bytes
+        // pkport.Write(new byte[] { 0x0A, 0xE2, 0xFF }, 0, 3);
+
+       */
+       // Close the port
+        //pkport.Close();
+
+
+          //  MessageBox.Show("The text read from the port is " + mylist);
+    }
+
+        private static void DataReceivedHandler( object sender,  SerialDataReceivedEventArgs e)
+        {
+            SerialPort sp = (SerialPort)sender;
+            System.Text.StringBuilder mylist = new System.Text.StringBuilder(" ");  // 11 chars in string
+            mylist.Append(sp.ReadTo("#"));
+            // string indata = sp.ReadExisting();
+            sp.Close();
+            
+            MessageBox.Show("Data received " + mylist);
+            
+
+        }
+
+
+
         private void setupThePort(ASCOM.Utilities.Serial testPort)
         {
             //set all the port propereties
@@ -203,6 +300,8 @@ namespace ASCOM.GowerCDome
             testPort.DTREnable = false;
             testPort.RTSEnable = false;
             testPort.ReceiveTimeout = 5;
+            testPort.DataBits = 8;
+            // testPort.StopBits = 1;
 
             testPort.Speed = ASCOM.Utilities.SerialSpeed.ps19200;
 
@@ -299,10 +398,10 @@ namespace ASCOM.GowerCDome
             {
                 LBLShutter.BackColor = Color.DarkGray;
                 //LBLAzimuth.BackColor = Color.DarkGray;
-                LBLStepper.BackColor = Color.DarkGray;
+                LBLcontrolBox.BackColor = Color.DarkGray;
                 LBLShutter.Refresh();
                 //LBLAzimuth.Refresh();
-                LBLStepper.Refresh();
+                LBLcontrolBox.Refresh();
 
                 LBLShutter.Text = "Shutter id in process....";
                 LBLShutter.Refresh();
@@ -310,9 +409,9 @@ namespace ASCOM.GowerCDome
                 string portName;                                                 //used to hold the name of the com port returned by portfinder()
 
                 portName = portFinder(tempPort, "shutter#", portlist);          // this routine returns the port name that replied e.g. COM7
-                LBLShutter.Text = checkForNull(portName, "Shutter");
+                LBLShutter.Text = checkForNull(portName, "shutter");
 
-                // check if port is unavailable and if so set the back colour to ornage
+                // check if port is unavailable and if so set the back colour to orange
                 if (LBLShutter.Text.Contains("Unavailable"))
                 {
                     LBLShutter.BackColor = Color.Orange;
@@ -331,7 +430,7 @@ namespace ASCOM.GowerCDome
                // LBLAzimuth.Text = "Azimuth id in process....";
                // LBLAzimuth.Refresh();
 
-                portName = portFinder(tempPort, "azimuth#", portlist);
+             //   portName = portFinder(tempPort, "azimuth#", portlist);
                // LBLAzimuth.Text = checkForNull(portName, "Azimuth encoder");
                 
                 // check if port is unavailable and if so set the back colour to ornage
@@ -350,19 +449,19 @@ namespace ASCOM.GowerCDome
 
                 portName = portFinder(tempPort, "controlbox#", portlist);
                 
-                LBLStepper.Text = "Dome drive id in process....";
-                LBLStepper.Refresh();
+                LBLcontrolBox.Text = "Dome drive id in process....";
+                LBLcontrolBox.Refresh();
 
-                LBLStepper.Text = checkForNull(portName, "Dome drive");
+                LBLcontrolBox.Text = checkForNull(portName, "Dome drive");
 
                 // check if port is unavailable and if so set the back colour to ornage
-                if (LBLStepper.Text.Contains("Unavailable") )
+                if (LBLcontrolBox.Text.Contains("Unavailable") )
                     {
-                    LBLStepper.BackColor = Color.Orange;
+                    LBLcontrolBox.BackColor = Color.Orange;
                     }
                 else
                    {
-                    LBLStepper.BackColor = Color.YellowGreen;
+                    LBLcontrolBox.BackColor = Color.YellowGreen;
                 }
             }
 
@@ -382,6 +481,11 @@ namespace ASCOM.GowerCDome
 
         }  // end id comports
 
+        private void btntest_Click(object sender, EventArgs e)
+        {
+            SendandReceiveData();
+            label2.Text = myGlobals.pkstring;
+        }
     }  // end public partial class
 
     public static class myGlobals     // this is a way of making a global variable set, accessible fom anywhere in the namespace. It's used to determine if all the com ports have been selected.
@@ -389,6 +493,7 @@ namespace ASCOM.GowerCDome
         public static bool check1 = false;
         public static bool check2 = false;
         public static bool check3 = false;
+        public static string pkstring = "eras";
 
     }
 }

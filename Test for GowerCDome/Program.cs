@@ -107,7 +107,10 @@ namespace ASCOM
 
            }  // endwhle pkazimuth
 
-           
+            Console.WriteLine("Shutter state is = ");                                  //  test the dome azimuth
+            Console.WriteLine(device.ShutterStatus);
+
+            
 
             Console.WriteLine("Press Enter to finish");
             Console.ReadLine();

@@ -257,10 +257,11 @@ namespace ASCOM.GowerCDome
             //set the control_Box motor connection
             try
             {
-                control_Box = OpenPort(control_BoxComPort);
+
 
                 // set the control box connection
                 control_Box = OpenPort(control_BoxComPort);
+                
                 pkShutter = OpenPort(ShutterComPort);
 
                 return true;    //pk added cos of build error not all code paths return a value
@@ -270,18 +271,14 @@ namespace ASCOM.GowerCDome
                 tl.LogMessage("Connected Set", "Unable to connect to COM ports " + ex.ToString());
 
                 if (control_Box != null)
-                {
+                  {
                     DisconnectPort(control_Box);
-                }
+                  }
                 
-                if (control_Box != null)
-                {
-                    DisconnectPort(control_Box);
-                }
                 if (pkShutter != null)
-                {
+                  {
                     DisconnectPort(pkShutter);
-                }
+                  }
                 return false;   //pk added cos of build error not all code paths return a value
                
             }
@@ -786,7 +783,7 @@ namespace ASCOM.GowerCDome
                 {
                     control_Box.ClearBuffers();                                         // this cured the receive problem from Arduino             
 
-                    control_Box.Transmit("SL#");                 //  accommodates the SL process in the stepper arduino
+                    control_Box.Transmit("SL#");                 //  accommodates the SL process in the control box mcu
                 }
                 catch (Exception ex)
                 {

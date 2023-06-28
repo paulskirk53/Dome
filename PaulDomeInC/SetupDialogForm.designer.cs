@@ -33,7 +33,7 @@ namespace ASCOM.GowerCDome
             this.label1 = new System.Windows.Forms.Label();
             this.picASCOM = new System.Windows.Forms.PictureBox();
             this.chkTrace = new System.Windows.Forms.CheckBox();
-            this.LBLStepper = new System.Windows.Forms.Label();
+            this.LBLcontrolBox = new System.Windows.Forms.Label();
             this.comboboxcontrol_box = new System.Windows.Forms.ComboBox();
             this.numericUpDownParkAzimuth = new System.Windows.Forms.NumericUpDown();
             this.lblparkazimuth = new System.Windows.Forms.Label();
@@ -105,14 +105,14 @@ namespace ASCOM.GowerCDome
             this.chkTrace.Text = "Trace on";
             this.chkTrace.UseVisualStyleBackColor = true;
             // 
-            // LBLStepper
+            // LBLcontrolBox
             // 
-            this.LBLStepper.AutoSize = true;
-            this.LBLStepper.Location = new System.Drawing.Point(16, 138);
-            this.LBLStepper.Name = "LBLStepper";
-            this.LBLStepper.Size = new System.Drawing.Size(139, 13);
-            this.LBLStepper.TabIndex = 8;
-            this.LBLStepper.Text = "Dome drive Control Box  on ";
+            this.LBLcontrolBox.AutoSize = true;
+            this.LBLcontrolBox.Location = new System.Drawing.Point(16, 138);
+            this.LBLcontrolBox.Name = "LBLcontrolBox";
+            this.LBLcontrolBox.Size = new System.Drawing.Size(139, 13);
+            this.LBLcontrolBox.TabIndex = 8;
+            this.LBLcontrolBox.Text = "Dome drive Control Box  on ";
             // 
             // comboboxcontrol_box
             // 
@@ -240,7 +240,7 @@ namespace ASCOM.GowerCDome
             this.Controls.Add(this.lblparkazimuth);
             this.Controls.Add(this.numericUpDownParkAzimuth);
             this.Controls.Add(this.comboboxcontrol_box);
-            this.Controls.Add(this.LBLStepper);
+            this.Controls.Add(this.LBLcontrolBox);
             this.Controls.Add(this.chkTrace);
             this.Controls.Add(this.picASCOM);
             this.Controls.Add(this.label1);
@@ -268,7 +268,7 @@ namespace ASCOM.GowerCDome
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.PictureBox picASCOM;
         private System.Windows.Forms.CheckBox chkTrace;
-        private System.Windows.Forms.Label LBLStepper;
+        private System.Windows.Forms.Label LBLcontrolBox;
         private System.Windows.Forms.ComboBox comboboxcontrol_box;
         private System.Windows.Forms.NumericUpDown numericUpDownParkAzimuth;
         private System.Windows.Forms.Label lblparkazimuth;
