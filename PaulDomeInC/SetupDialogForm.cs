@@ -374,21 +374,20 @@ namespace ASCOM.GowerCDome
             }
         }  // end id comports
 
-        private void settheComboboxitem(string testItem, ComboBox zzz)
+        private void settheComboboxitem(string testItem, ComboBox cboTest)
 
         {
             string item_text = "";
-            for (int i = 0; i < zzz.Items.Count; i++)
+            for (int i = 0; i < cboTest.Items.Count; i++)
             {
-                item_text = zzz.GetItemText(zzz.Items[i]);
+                item_text = cboTest.GetItemText(cboTest.Items[i]);
                 if (item_text == testItem)
-                {
-                    zzz.SelectedItem = (object)zzz.Items[i];
+                { 
+                    cboTest.SelectedItem = (object)cboTest.Items[i];
                     break;
                 }
             }
-
-
+            
         }
 
       
