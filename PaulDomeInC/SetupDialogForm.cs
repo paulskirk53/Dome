@@ -32,7 +32,7 @@ namespace ASCOM.GowerCDome
             
             // Place any validation constraint checks here
             // Update the state variables with results from the dialogue
-         //   Dome.comPort = (string)comboBoxComPort.SelectedItem;
+         
             Dome.tl.Enabled = chkTrace.Checked;
           
             Dome.control_BoxComPort = (string)comboboxcontrol_box.SelectedItem;   //user selected port for control box MCU
@@ -73,9 +73,7 @@ namespace ASCOM.GowerCDome
 
             //set the three globals to false - these will be set to true if the com port combo box selection change committed event fires (i.e. a comport is picked by the user)
 
-            myGlobals.check1 = false;
-            myGlobals.check2 = false;
-            myGlobals.check3 = false;
+          
 
             chkTrace.Checked = Dome.tl.Enabled;
             // set the list of com ports to those that are currently available
@@ -160,7 +158,7 @@ namespace ASCOM.GowerCDome
             int n = 0;
 
             // MessageBox.Show("Sending " + MCUDescription + " to port " + testPort.PortName);  // + "received " + response);
-            while ((success == false) && (n < 3))
+            while ((success == false) && (n < 3))   // try each port three times
             {
                 try
                 {
@@ -169,7 +167,7 @@ namespace ASCOM.GowerCDome
 
 
                     testPort.Write(MCUDescription);                   // transmits controlbox# or shutter# depending upon where called
-                    testPort.ReadTimeout = 1000;                        // milli seconds                
+                    testPort.ReadTimeout = 1000;                      // milliseconds                
                     response = testPort.ReadTo("#");                  // only one port will respond to the query and those which don't respond will timeout
                                                                       //  MessageBox.Show("this is what the MCU sent back   " + response);
 
@@ -179,15 +177,15 @@ namespace ASCOM.GowerCDome
                     // MessageBox.Show("Reponse and mcu description follow  " + response +" " + MCUDescription );
                     if (response == MCUDescription)
                     {
-                        success = true;
-                        testPort.Close();
+                        success = true;                // the mcu exists on this port
+                        testPort.Close();              // finished with the port
                         return true;
                         //   break;
                     }
                 }
                 catch
                 {
-
+                    // the catch is for the timeout exception which occurs when a port tested is unresponsive (all except the correct one will be ) no need to do anything
                 }
                 n++;
 
@@ -201,66 +199,7 @@ namespace ASCOM.GowerCDome
         }     //end proc
 
 
-
-
-      private static void SendandReceiveData()
-    {
-        // Instantiate the communications
-        // port with some basic settings
-        SerialPort pkport = new SerialPort(
-          "COM4", 19200, Parity.None, 8, StopBits.One);
-
-           
-
-            // Open the port for communications
-
-            pkport.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
-
-
-            pkport.Open();
-            Thread.Sleep(500);
-
-            // Write a string to the port
-            pkport.Write("shutter#");
-            //Thread.Sleep(500);
-
-            // read from the port
-
-            System.Text.StringBuilder mylist = new System.Text.StringBuilder(" ");  // 11 chars in string
-
-          /* //example ignore mylist[0] = 'C';
-            while (pkport.ReadExisting() != "#" | (mylist.Length<15)  )
-            {
-               
-                mylist.Append( pkport.ReadExisting() );
-            
-            }
-        // Write a set of bytes
-        // pkport.Write(new byte[] { 0x0A, 0xE2, 0xFF }, 0, 3);
-
-       */
-       // Close the port
-        //pkport.Close();
-
-
-          //  MessageBox.Show("The text read from the port is " + mylist);
-    }
-
-        private static void DataReceivedHandler( object sender,  SerialDataReceivedEventArgs e)
-        {
-            SerialPort sp = (SerialPort)sender;
-            System.Text.StringBuilder mylist = new System.Text.StringBuilder(" ");  // 11 chars in string
-            mylist.Append(sp.ReadTo("#"));
-            // string indata = sp.ReadExisting();
-            sp.Close();
-            
-            MessageBox.Show("Data received " + mylist);
-            
-
-        }
-
-
-
+        
         private void setupThePort(System.IO.Ports.SerialPort testPort)
         {
             //set all the port propereties
@@ -271,43 +210,7 @@ namespace ASCOM.GowerCDome
                         
         }
 
-        
-
        
-
-      //  private void comboBoxComPort_SelectionChangeCommitted(object sender, EventArgs e)   // bad name for the combo - this is the selection change for the azimuth comport
-      //  {
-      //      
-      //      myGlobals.check1 = true;
-      //      overallCheck();
-      //  }
-
-        private void comboBoxComPortShutter_SelectionChangeCommitted(object sender, EventArgs e)
-        {
-            myGlobals.check2 = true;
-            overallCheck();
-        }
-
-        private void comboboxcontrol_box_SelectionChangeCommitted(object sender, EventArgs e)
-        {
-            myGlobals.check3 = true;
-            overallCheck();
-        }
-        private void overallCheck()      // a way of checking if all the com ports have been picked by the end user.
-        {
-            if (myGlobals.check1 && myGlobals.check2 && myGlobals.check3)
-            {
-                cmdOK.Enabled = true;
-            }
-        }
-
-        private void btnApply_Click(object sender, EventArgs e)
-        {
-            myGlobals.check1 = true;
-            myGlobals.check2 = true;
-            myGlobals.check3 = true;
-            overallCheck();
-        }
 
         private void BTNidcomports_Click(object sender, EventArgs e)
         {
@@ -450,7 +353,7 @@ namespace ASCOM.GowerCDome
             //reset the command button text
             BTNidcomports.Text = "Identify Comports";
 
-
+            cmdOK.Enabled = true;
             
         }  // end id comports
 
@@ -471,14 +374,10 @@ namespace ASCOM.GowerCDome
 
         }
 
-        private void btntest_Click(object sender, EventArgs e)
-        {
-            SendandReceiveData();
-          //  label2.Text = myGlobals.pkstring;
-        }
+      
     }  // end public partial class
 
-    public static class myGlobals     // this is a way of making a global variable set, accessible fom anywhere in the namespace. It's used to determine if all the com ports have been selected.
+    public static class myGlobals     // this is a way of making a global variable set, accessible fom anywhere in the namespace. 
     {
         public static bool check1 = false;
         public static bool check2 = false;

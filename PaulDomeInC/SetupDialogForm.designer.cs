@@ -41,7 +41,6 @@ namespace ASCOM.GowerCDome
             this.comboBoxComPortShutter = new System.Windows.Forms.ComboBox();
             this.numericUpDownHomeAzimuth = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
-            this.btnApply = new System.Windows.Forms.Button();
             this.BTNidcomports = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownParkAzimuth)).BeginInit();
@@ -172,7 +171,6 @@ namespace ASCOM.GowerCDome
             this.comboBoxComPortShutter.Size = new System.Drawing.Size(88, 21);
             this.comboBoxComPortShutter.TabIndex = 13;
             this.comboBoxComPortShutter.Text = "Choose Port";
-            this.comboBoxComPortShutter.SelectionChangeCommitted += new System.EventHandler(this.comboBoxComPortShutter_SelectionChangeCommitted);
             // 
             // numericUpDownHomeAzimuth
             // 
@@ -206,16 +204,6 @@ namespace ASCOM.GowerCDome
             this.label4.TabIndex = 15;
             this.label4.Text = "Home Position";
             // 
-            // btnApply
-            // 
-            this.btnApply.Location = new System.Drawing.Point(464, 204);
-            this.btnApply.Name = "btnApply";
-            this.btnApply.Size = new System.Drawing.Size(60, 29);
-            this.btnApply.TabIndex = 16;
-            this.btnApply.Text = "Apply";
-            this.btnApply.UseVisualStyleBackColor = true;
-            this.btnApply.Click += new System.EventHandler(this.btnApply_Click);
-            // 
             // BTNidcomports
             // 
             this.BTNidcomports.Location = new System.Drawing.Point(409, 129);
@@ -232,7 +220,6 @@ namespace ASCOM.GowerCDome
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(534, 302);
             this.Controls.Add(this.BTNidcomports);
-            this.Controls.Add(this.btnApply);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.numericUpDownHomeAzimuth);
             this.Controls.Add(this.comboBoxComPortShutter);
@@ -276,7 +263,6 @@ namespace ASCOM.GowerCDome
         private System.Windows.Forms.ComboBox comboBoxComPortShutter;
         private System.Windows.Forms.NumericUpDown numericUpDownHomeAzimuth;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Button btnApply;
         private System.Windows.Forms.Button BTNidcomports;
     }
 }

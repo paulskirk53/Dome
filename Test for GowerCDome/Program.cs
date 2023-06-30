@@ -66,9 +66,10 @@ namespace ASCOM
                if (double.TryParse(response, out result))
 
                    pkazimuth = result;
-
-               Console.WriteLine("Requested Target is  " + pkazimuth);
-
+                if (pkazimuth < 361)
+                {
+                    Console.WriteLine("Requested Target is  " + pkazimuth);
+                }
 
                if (pkazimuth > 360.0)                                             // leave the while loop if pkazimuth >360
                {
