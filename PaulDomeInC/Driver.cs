@@ -86,7 +86,7 @@ namespace ASCOM.GowerCDome
         internal static string comPortDefault                = "COM4";
         internal static string traceStateProfileName         = "Trace Level";
         internal static string traceStateDefault             = "false";
-        internal static string comPort;                  // Variables to hold the currrent device configuration
+      //  internal static string comPort;                  // Variables to hold the currrent device configuration
       
         internal static string control_BoxComPort;
         internal static string ShutterComPort;
@@ -253,6 +253,7 @@ namespace ASCOM.GowerCDome
 
         private bool Connect()
         {
+            
             tl.LogMessage("Connected Set", "Connecting to port " + control_BoxComPort );
             //set the control_Box motor connection
             try

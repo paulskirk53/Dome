@@ -54,8 +54,8 @@ namespace ASCOM
 
 
                Console.WriteLine("connection status  " + device.Connected);          // show connection status
-          //      Console.WriteLine("Slewing status  " + device.Slewing);
-
+                                                                                     //      Console.WriteLine("Slewing status  " + device.Slewing);
+                Console.WriteLine("Current azimuth is  " + device.Azimuth );
                 Console.Write("New Azimuth value ? a number > 360 exits the routine :");                            // invite user input for azimuth tests
 
                string response = Console.ReadLine();
@@ -107,6 +107,8 @@ namespace ASCOM
 
            }  // endwhle pkazimuth
 
+
+            Console.WriteLine("Target achieved, azimuth is = " + device.Azimuth );                                  //  test the dome azimuth
             Console.WriteLine("Shutter state is = ");                                  //  test the dome azimuth
             Console.WriteLine(device.ShutterStatus);
 

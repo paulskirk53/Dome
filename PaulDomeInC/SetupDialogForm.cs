@@ -115,7 +115,7 @@ namespace ASCOM.GowerCDome
             }
         }
 
-        private string portFinder(ASCOM.Utilities.Serial testPort, string mcuName, List<string> portlist)  //mcuName will be e.g "controlbox" or "shutter"
+        private string portFinder(System.IO.Ports.SerialPort testPort, string mcuName, List<string> portlist)  //mcuName will be e.g "controlbox" or "shutter"
         {
             //*
             // * This routine uses a test port to cycle through the portnames (COM1, COM3 etc), checking each port 
@@ -131,7 +131,7 @@ namespace ASCOM.GowerCDome
                 if (found)
                 {
                   //  MessageBox.Show("the port is found " + portName);
-                    testPort.Connected = false;                    //disconnect the port
+                    testPort.Close();                    //disconnect the port
                     return portName;
 
                 }
@@ -143,97 +143,65 @@ namespace ASCOM.GowerCDome
           //  throw new NullReferenceException();
         }
 
-        private bool checkforMCU(ASCOM.Utilities.Serial testPort, string portName, string MCUDescription)
+        private bool checkforMCU(System.IO.Ports.SerialPort testPort, string portName, string MCUDescription)     // Note Seril is short form for system.io.ports Serial
         {
 
-            testPort.PortName = portName;  
-            
-            testPort.Connected = true;
-            Thread.Sleep(500);           // delay (in mS) - essential if the MCU is Arduino with a bootloader. The Arduino requires time after the port is connected before it can respond to serial requests.
+          //  MessageBox.Show("Sending " + MCUDescription + " to port " + portName);
+            testPort.PortName = portName;
 
+          
             // send data to the MCU and see what comes back
 
             string response = "";
-
+            
             //     new below
-/*
+
             bool success = false;
             int n = 0;
-            
-               // MessageBox.Show("Sending " + MCUDescription + " to port " + testPort.PortName);  // + "received " + response);
-                while ((success == false) && (n < 4))
-                {
+
+            // MessageBox.Show("Sending " + MCUDescription + " to port " + testPort.PortName);  // + "received " + response);
+            while ((success == false) && (n < 3))
+            {
                 try
                 {
-                    
-                     testPort.Transmit(MCUDescription);                   // transmits controlbox# or shutter# depending upon where called
-                   
-                    response = testPort.ReceiveTerminated("#");          // not all ports respond to a query and those which don't respond will timeout
-                    MessageBox.Show("this is what the MCU received   " + response);
-                }
-                catch
-                {
-                   // MessageBox.Show("Fail iteration " + n);
-                }
-                    
+                    testPort.Open();
+                    Thread.Sleep(500);           // delay (in mS) - essential if the MCU is Arduino with a bootloader. The Arduino requires time after the port is connected before it can respond to serial requests.
 
+
+                    testPort.Write(MCUDescription);                   // transmits controlbox# or shutter# depending upon where called
+                    testPort.ReadTimeout = 1000;                        // milli seconds                
+                    response = testPort.ReadTo("#");                  // only one port will respond to the query and those which don't respond will timeout
+                                                                      //  MessageBox.Show("this is what the MCU sent back   " + response);
+
+
+                    //append the # char to response so the comparison strings both have '#'
+                    response += "#";
+                    // MessageBox.Show("Reponse and mcu description follow  " + response +" " + MCUDescription );
                     if (response == MCUDescription)
                     {
                         success = true;
-                        testPort.Connected = false;
+                        testPort.Close();
                         return true;
-                     //   break;
+                        //   break;
                     }
-                        n++;
-                }  //end while
-
-            */  
-            
-
-       // end new
-
-             //beow is what it used to be prior to 25-6-23
-            try
-            {
-                
-
-               //  MessageBox.Show("Sending " + MCUDescription + " to port " + portName);
-               
-                testPort.Transmit(MCUDescription);                   // transmits controlbox# or shutter# depending upon where called
-                
-            
-                 response = testPort.ReceiveTerminated("#");   // not all ports respond to a query and those which don't respond will timeout
-             
-               // MessageBox.Show("the response from the MCU " + response);
-              
-                if (response == MCUDescription)
-                {
-                    testPort.Connected = false;
-                    return true;            //mcu response match
                 }
-                else
+                catch
                 {
-                    testPort.Connected = false;
+
+                }
+                n++;
+
+            } // end while
+
+
+
+            testPort.Close();
                     return false;
-                }
-
-               
-            }
-            catch (Exception e)     //TimeoutException
-            {
-
-                  testPort.Connected = false;   
-               // MessageBox.Show("the MCU  did not respond to  " + MCUDescription);
-            }
             
-            // star slash
+        }     //end proc
 
-            testPort.Connected = false;
-            return false;
-        }
-// This is a new namespace in .NET 2.0
-// that contains the SerialPort class
-//using System.IO.Ports;
+
+
 
       private static void SendandReceiveData()
     {
@@ -293,20 +261,14 @@ namespace ASCOM.GowerCDome
 
 
 
-        private void setupThePort(ASCOM.Utilities.Serial testPort)
+        private void setupThePort(System.IO.Ports.SerialPort testPort)
         {
             //set all the port propereties
-
-            testPort.DTREnable = false;
-            testPort.RTSEnable = false;
-            testPort.ReceiveTimeout = 5;
+            testPort.BaudRate = 19200;
+            testPort.Parity = Parity.None; ;
             testPort.DataBits = 8;
-            // testPort.StopBits = 1;
-
-            testPort.Speed = ASCOM.Utilities.SerialSpeed.ps19200;
-
-
-
+            testPort.StopBits = StopBits.One; 
+                        
         }
 
         
@@ -354,28 +316,39 @@ namespace ASCOM.GowerCDome
 
 
 
-            ASCOM.Utilities.Serial tempPort = new ASCOM.Utilities.Serial();     // setup a variable as an ascom utils serial object
+            System.IO.Ports.SerialPort tempPort = new System.IO.Ports.SerialPort();     // setup a variable as an ascom utils serial object
 
-            var portlist = new List<string>(tempPort.AvailableCOMPorts);         // create a list of available comports on tempPort
+            
+
+            var portlist = new List<string>(SerialPort.GetPortNames() );         // create a list of available comports on tempPort
             var busyPorts = new List<string>();
             portlist.Remove("COM1");                                             // COM1 is never used by MCUs
 
 
             //write some code to try to connect to the ports and if that fails, the port is busy, so remove it from the list..
+            //todo remove below
+            //foreach (string port in portlist)
+           // {
+           //     MessageBox.Show("Port names are " + port);
+           // }
 
-            foreach (string port in portlist)
+
+                foreach (string port in portlist)
             {
                 try
                 {
+                   // MessageBox.Show("trying " + port);
                     tempPort.PortName = port;
-                    tempPort.Connected = true;
-                    tempPort.Connected = false;
+                    tempPort.Open();
+                    tempPort.Write("test");
+                    tempPort.Close();
                   //  MessageBox.Show("Try port " + port);
                 }
                 catch
                 {
                     // if we get here connection failed, so remoe thport from the list
                     busyPorts.Add(port);
+
                    // MessageBox.Show("Catch port to remove " + port);
                 }
             }    // end foreach
@@ -386,7 +359,13 @@ namespace ASCOM.GowerCDome
                 portlist.Remove(port);
             }
 
-            portlist.ToArray();
+                portlist.ToArray();
+
+
+        //    foreach (string port in portlist)
+        //    {
+        //        MessageBox.Show("Port names are " + port);
+        //    }
 
             //now send id messages to each port in the list to find which MCU is attached to which port.
             label1.Text= "Please wait while ID takes place";
@@ -408,7 +387,12 @@ namespace ASCOM.GowerCDome
 
                 string portName;                                                 //used to hold the name of the com port returned by portfinder()
 
+                // call portfinder to identify which port the shutter MCU is attached to
+
                 portName = portFinder(tempPort, "shutter#", portlist);          // this routine returns the port name that replied e.g. COM7
+
+                settheComboboxitem( portName, comboBoxComPortShutter);
+
                 LBLShutter.Text = checkForNull(portName, "shutter");
 
                 // check if port is unavailable and if so set the back colour to orange
@@ -426,28 +410,15 @@ namespace ASCOM.GowerCDome
                 portlist.Remove(portName);                                      // remove from the portlist to reduce the list size and future processing time
 
 
-                
-               // LBLAzimuth.Text = "Azimuth id in process....";
-               // LBLAzimuth.Refresh();
-
-             //   portName = portFinder(tempPort, "azimuth#", portlist);
-               // LBLAzimuth.Text = checkForNull(portName, "Azimuth encoder");
-                
-                // check if port is unavailable and if so set the back colour to ornage
-               // if (LBLAzimuth.Text.Contains("Unavailable"))
-               // {
-               //     LBLAzimuth.BackColor = Color.Orange;
-               // }
-               // else
-               // {
-               //     
-               //     LBLAzimuth.BackColor = Color.YellowGreen;
-               // }
-
-               // LBLAzimuth.Refresh();
+      
                 portlist.Remove(portName);
 
+
+                // call portfinder to identify which port the controlbox MCU is attached to
+
                 portName = portFinder(tempPort, "controlbox#", portlist);
+
+                settheComboboxitem(portName, comboboxcontrol_box );
                 
                 LBLcontrolBox.Text = "Dome drive id in process....";
                 LBLcontrolBox.Refresh();
@@ -479,12 +450,31 @@ namespace ASCOM.GowerCDome
             //reset the command button text
             BTNidcomports.Text = "Identify Comports";
 
+
+            
         }  // end id comports
+
+        private void settheComboboxitem(string testItem, ComboBox zzz)
+
+        {
+            string item_text = "";
+            for (int i = 0; i < zzz.Items.Count; i++)
+            {
+                item_text = zzz.GetItemText(zzz.Items[i]);
+                if (item_text == testItem)
+                {
+                    zzz.SelectedItem = (object)zzz.Items[i];
+                    break;
+                }
+            }
+
+
+        }
 
         private void btntest_Click(object sender, EventArgs e)
         {
             SendandReceiveData();
-            label2.Text = myGlobals.pkstring;
+          //  label2.Text = myGlobals.pkstring;
         }
     }  // end public partial class
 
