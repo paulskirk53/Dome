@@ -214,6 +214,8 @@ namespace ASCOM.GowerCDome
 
         private void BTNidcomports_Click(object sender, EventArgs e)
         {
+
+            bool portsAreAvailable = true;
             BTNidcomports.Text = "Waiting for ID";
             BTNidcomports.Refresh();
 
@@ -294,6 +296,13 @@ namespace ASCOM.GowerCDome
 
                 portName = portFinder(tempPort, "shutter#", portlist);          // this routine returns the port name that replied e.g. COM7
 
+
+                if (portName == null)    // this happens if there are missing MCUs e.g. USB cable not connected
+                {
+
+                    throw new ArgumentNullException();
+                }
+
                 settheComboboxitem( portName, comboBoxComPortShutter);
 
                 LBLShutter.Text = checkForNull(portName, "shutter");
@@ -312,14 +321,19 @@ namespace ASCOM.GowerCDome
                 LBLShutter.Refresh();
                 portlist.Remove(portName);                                      // remove from the portlist to reduce the list size and future processing time
 
-
-      
-                portlist.Remove(portName);
+                
 
 
                 // call portfinder to identify which port the controlbox MCU is attached to
 
                 portName = portFinder(tempPort, "controlbox#", portlist);
+              //  MessageBox.Show("Port name is " + portName);
+
+                if (portName == null )    // this happens if there are missing MCUs e.g. USB cable not connected
+                {
+                    
+                    throw new ArgumentNullException();
+                }
 
                 settheComboboxitem(portName, comboboxcontrol_box );
                 
@@ -342,7 +356,8 @@ namespace ASCOM.GowerCDome
             catch (Exception ex)
             {
 
-                MessageBox.Show(" connection failed. Check the MCUs are on, connected, and in receive mode." + ex.Message);
+                MessageBox.Show(" connection failed. Check the MCUs are on, connected, and in receive mode. " + ex.Message);
+                portsAreAvailable = false;
             }
 
 
@@ -353,8 +368,10 @@ namespace ASCOM.GowerCDome
             //reset the command button text
             BTNidcomports.Text = "Identify Comports";
 
-            cmdOK.Enabled = true;
-            
+            if (portsAreAvailable)
+            {
+                cmdOK.Enabled = true;
+            }
         }  // end id comports
 
         private void settheComboboxitem(string testItem, ComboBox zzz)

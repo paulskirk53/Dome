@@ -687,41 +687,7 @@ namespace ASCOM.GowerCDome
                     default:
                         return ShutterState.shutterClosed;
                 }
-/*
-                if (state == "OPEN")
-                {
-                    return ShutterState.shutterOpen;
-                }
-                if (state == "CLOSED")
-                {
-                    return ShutterState.shutterClosed;
-                  
-                }
 
-                //perhaps use this when the four options are available (open epening etc)
-                
-                
-                                switch (state)
-                                {
-                                    case  "OPEN":
-                                        return ShutterState.shutterOpen;
-                                        break;
-                                    case   "CLOSED":
-                                        return ShutterState.shutterClosed;
-                                        break;
-                                    case   "OPENING":
-                                        return ShutterState.shutterOpening;
-                                        break;
-                                    case   "CLOSING":
-                                        return ShutterState.shutterClosing;
-                                        break;
-
-                                    default:
-
-                                        break;
-                                }
-
-                    */
 
             }
 
