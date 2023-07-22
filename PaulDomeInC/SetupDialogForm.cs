@@ -162,6 +162,7 @@ namespace ASCOM.GowerCDome
             {
                 try
                 {
+                    response = "";
                     testPort.Open();
                     Thread.Sleep(500);           // delay (in mS) - essential if the MCU is Arduino with a bootloader. The Arduino requires time after the port is connected before it can respond to serial requests.
 
