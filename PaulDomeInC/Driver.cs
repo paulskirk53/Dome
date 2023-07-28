@@ -672,20 +672,20 @@ namespace ASCOM.GowerCDome
                 switch(state)
                 {
 
-                    case "OPEN":
+                    case "open":
 
                         return ShutterState.shutterOpen;
 
                     case "opening":
                         return ShutterState.shutterOpening;
 
-                    case "CLOSED":
+                    case "closed":
                         return ShutterState.shutterClosed;
 
                     case "closing":
                         return ShutterState.shutterClosing;
                     default:
-                        return ShutterState.shutterClosed;
+                        return ShutterState.shutterClosed;     // runs if there's no case match
                 }
 
 
