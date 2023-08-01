@@ -69,7 +69,7 @@ namespace ASCOM.GowerCDome
 
         private void InitUI()
         {
-            cmdOK.Enabled = false;     // disable the ok button until ports are picked todo pk
+            cmdOK.Enabled = true;     // disable the ok button until ports are picked todo pk
 
             //set the three globals to false - these will be set to true if the com port combo box selection change committed event fires (i.e. a comport is picked by the user)
 
