@@ -38,7 +38,7 @@ namespace ASCOM
                       Console.WriteLine("description " + device.Description);
                       Console.WriteLine("DriverInfo " + device.DriverInfo);
                       Console.WriteLine("driverVersion " + device.DriverVersion);
-                      Console.WriteLine("ERAS");
+                      Console.WriteLine("Test");
                       // TODO add more code to test the driver.
           
 
