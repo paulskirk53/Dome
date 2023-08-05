@@ -801,6 +801,11 @@ ASCOM.Utilities
  with an empty string parameter to achieve this effect.</para>
  </remarks>
 </member>
+<member name="T:ASCOM.Utilities.ChooserForm">
+ <summary>
+ Form displayed to enable the user to select an ASCOM device.
+ </summary>
+</member>
 <member name="M:ASCOM.Utilities.ChooserForm.Dispose(System.Boolean)">
  <summary>
  Dispose of disposable components
@@ -3060,8 +3065,8 @@ ASCOM.Utilities
  <summary>
  Writes a string value to the profile using the supplied subkey for the given Driver ID and variable name.
  </summary>
- <param name="DriverID">ProgID of the device to read from</param>
- <param name="Name">Name of the variable whose value is retrieved</param>
+ <param name="DriverID">ProgID of the device to write to</param>
+ <param name="Name">Name of the variable whose value is to be written</param>
  <param name="Value">The string value to be written</param>
  <param name="SubKey">Subkey from the profile root in which to write the value</param>
  <exception cref="T:ASCOM.Utilities.Exceptions.InvalidValueException">Thrown if DriverID is an empty string.</exception>
@@ -3276,8 +3281,8 @@ ASCOM.Utilities
  <summary>
  Writes a string value to the profile using the given Driver ID and variable name.
  </summary>
- <param name="DriverID">ProgID of the device to read from</param>
- <param name="Name">Name of the variable whose value is retrieved</param>
+ <param name="DriverID">ProgID of the device to write to</param>
+ <param name="Name">Name of the variable whose value is to be written</param>
  <param name="Value">The string value to be written</param>
  <exception cref="T:ASCOM.Utilities.Exceptions.InvalidValueException">Thrown if DriverID is an empty string.</exception>
  <exception cref="T:ASCOM.Utilities.Exceptions.DriverNotRegisteredException">Thrown if the driver is not registered,</exception>
