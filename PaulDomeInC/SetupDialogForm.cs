@@ -130,7 +130,7 @@ namespace ASCOM.GowerCDome
                 {
                   //  MessageBox.Show("the port is found " + portName);
                     testPort.Close();                    //disconnect the port
-                    return portName;
+                    return portName;                     // return stmt exits the function when executed
 
                 }
 
@@ -157,7 +157,7 @@ namespace ASCOM.GowerCDome
             bool success = false;
             int n = 0;
 
-            // MessageBox.Show("Sending " + MCUDescription + " to port " + testPort.PortName);  // + "received " + response);
+            MessageBox.Show("Sending " + MCUDescription + " to port " + testPort.PortName);  // + "received " + response);
             while ((success == false) && (n < 3))   // try each port three times
             {
                 try
@@ -170,12 +170,12 @@ namespace ASCOM.GowerCDome
                     testPort.Write(MCUDescription);                   // transmits controlbox# or shutter# depending upon where called
                     testPort.ReadTimeout = 1000;                      // milliseconds                
                     response = testPort.ReadTo("#");                  // only one port will respond to the query and those which don't respond will timeout
-                                                                      //  MessageBox.Show("this is what the MCU sent back   " + response);
+                                                                      // and be caught by 'catch'
 
 
                     //append the # char to response so the comparison strings both have '#'
                     response += "#";
-                    // MessageBox.Show("Reponse and mcu description follow  " + response +" " + MCUDescription );
+                    // MessageBox.Show("Reponse, mcu description and port follow  " + response +" " + MCUDescription +testPort.PortName );
                     if (response == MCUDescription)
                     {
                         success = true;                // the mcu exists on this port, iterations now stop
@@ -269,14 +269,16 @@ namespace ASCOM.GowerCDome
 
                 portlist.ToArray();
 
-            /*
-                         string pklist = "";   
-                         foreach (string port in portlist)
-                          {
-                            pklist += ( port + " ");
-                          }
-                             MessageBox.Show("available Port names are " + "\n" + pklist);
-             */
+//debug code below can be deleted
+            string pklist = "";   
+            foreach (string port in portlist)
+                {
+                pklist += ( port + " ");
+                }
+             MessageBox.Show("available Port names are " + "\n" + pklist);
+
+//end debug code
+            
             //now send id messages to each port in the list to find which MCU is attached to which port.
             label1.Text= "Please wait while ID takes place";
             label1.TextAlign = ContentAlignment.MiddleCenter;
