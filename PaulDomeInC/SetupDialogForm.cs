@@ -178,10 +178,8 @@ namespace ASCOM.GowerCDome
                     // MessageBox.Show("Reponse and mcu description follow  " + response +" " + MCUDescription );
                     if (response == MCUDescription)
                     {
-                        success = true;                // the mcu exists on this port
+                        success = true;                // the mcu exists on this port, iterations now stop
                         testPort.Close();              // finished with the port
-                       // return true;
-                           break;                // no need to do more iterations
                     }
                 }
                 catch
