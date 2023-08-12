@@ -122,9 +122,9 @@ namespace ASCOM.GowerCDome
              //*
             setupThePort(testPort);            //set the parameters for testport - baud etc
             bool found = false;
-            foreach (string portName in portlist)     // GetUnusedSerialPorts forms a list of COM ports which are available
+            foreach (string portName in portlist)     
             {
-               // MessageBox.Show("the port being checked is " + portName);        //tis worked
+               // MessageBox.Show("the port being checked is " + portName);   
                 found = checkforMCU(testPort, portName, mcuName);     // this checks if the current portName responds to mcuName (controlbox# / shutter#)
                 if (found)
                 {
@@ -180,8 +180,8 @@ namespace ASCOM.GowerCDome
                     {
                         success = true;                // the mcu exists on this port
                         testPort.Close();              // finished with the port
-                        return true;
-                        //   break;
+                       // return true;
+                           break;                // no need to do more iterations
                     }
                 }
                 catch
@@ -191,11 +191,14 @@ namespace ASCOM.GowerCDome
                 n++;
 
             } // end while
+            
 
+            testPort.Close();      // in case of no success
 
-
-            testPort.Close();
-                    return false;
+            if (success)
+            { return true; }
+            else
+            { return false; }
             
         }     //end proc
 
@@ -254,6 +257,7 @@ namespace ASCOM.GowerCDome
                 {
                     // if we get here connection failed, so remoe thport from the list
                     busyPorts.Add(port);
+                    
 
                    // MessageBox.Show("Catch port to remove " + port);
                 }
@@ -267,12 +271,14 @@ namespace ASCOM.GowerCDome
 
                 portlist.ToArray();
 
-
-        //    foreach (string port in portlist)
-        //    {
-        //        MessageBox.Show("Port names are " + port);
-        //    }
-
+            /*
+                         string pklist = "";   
+                         foreach (string port in portlist)
+                          {
+                            pklist += ( port + " ");
+                          }
+                             MessageBox.Show("available Port names are " + "\n" + pklist);
+             */
             //now send id messages to each port in the list to find which MCU is attached to which port.
             label1.Text= "Please wait while ID takes place";
             label1.TextAlign = ContentAlignment.MiddleCenter;
@@ -281,21 +287,13 @@ namespace ASCOM.GowerCDome
             label1.Refresh();
             try
             {
-                LBLShutter.BackColor = Color.DarkGray;
-                //LBLAzimuth.BackColor = Color.DarkGray;
-                LBLcontrolBox.BackColor = Color.DarkGray;
-                LBLShutter.Refresh();
-                //LBLAzimuth.Refresh();
-                LBLcontrolBox.Refresh();
+                setTheLabeAttributes();
 
-                LBLShutter.Text = "Shutter id in process....";
-                LBLShutter.Refresh();
-
-                string portName;                                                 //used to hold the name of the com port returned by portfinder()
+                string portName;   //used to hold the name of the com port returned by portfinder()
 
                 // call portfinder to identify which port the shutter MCU is attached to
 
-                portName = portFinder(tempPort, "shutter#", portlist);          // this routine returns the port name that replied e.g. COM7
+                portName = portFinder(tempPort, "shutter#", portlist);          // this routine returns the port name that replied as shutter e.g. COM7
 
 
                 if (portName == null)    // this happens if there are missing MCUs e.g. USB cable not connected
@@ -320,7 +318,7 @@ namespace ASCOM.GowerCDome
                 }
 
                 LBLShutter.Refresh();
-                portlist.Remove(portName);                                      // remove from the portlist to reduce the list size and future processing time
+                portlist.Remove(portName);       // remove from the portlist to reduce the list size and future processing time
 
                 
 
@@ -336,7 +334,7 @@ namespace ASCOM.GowerCDome
                     throw new ArgumentNullException();
                 }
 
-                settheComboboxitem(portName, comboboxcontrol_box );
+                settheComboboxitem(portName, comboboxcontrol_box );     // select the item in the combo box control list
                 
                 LBLcontrolBox.Text = "Dome drive id in process....";
                 LBLcontrolBox.Refresh();
@@ -352,7 +350,7 @@ namespace ASCOM.GowerCDome
                    {
                     LBLcontrolBox.BackColor = Color.YellowGreen;
                 }
-            }
+            }     // end try
 
             catch (Exception ex)
             {
@@ -375,6 +373,16 @@ namespace ASCOM.GowerCDome
             }
         }  // end id comports
 
+        private void setTheLabeAttributes()
+        {
+            LBLShutter.BackColor = Color.DarkGray;
+            LBLcontrolBox.BackColor = Color.DarkGray;
+            LBLShutter.Text = "Shutter id in process....";
+            LBLShutter.Refresh();
+            LBLcontrolBox.Refresh();
+            LBLShutter.Refresh();
+
+        }
         private void settheComboboxitem(string testItem, ComboBox cboTest)
 
         {
