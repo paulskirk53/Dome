@@ -63,7 +63,8 @@ namespace ASCOM.GowerCDome
     /// <summary>
     /// ASCOM Dome Driver for GowerCDome.
     /// </summary>
-    [Guid("0edcf62a-9d7a-4a63-b8c2-f2f151c93ba7")]
+    [Guid("D3A3ADF4-75D2-47C6-958C-FF84332097DD")]    // NUC requires a different guid from the dev machine
+    //[Guid("0edcf62a-9d7a-4a63-b8c2-f2f151c93ba7")]  //dev machine guid
     [ClassInterface(ClassInterfaceType.None)]
     public class Dome : IDomeV2
     {
