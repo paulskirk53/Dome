@@ -69,7 +69,7 @@ namespace ASCOM.GowerCDome
 
         private void InitUI()
         {
-            cmdOK.Enabled = true;     // disable the ok button until ports are picked todo pk
+            cmdOK.Enabled = true;     // enable the form's ok button  
 
             //set the three globals to false - these will be set to true if the com port combo box selection change committed event fires (i.e. a comport is picked by the user)
 
@@ -157,7 +157,7 @@ namespace ASCOM.GowerCDome
             bool success = false;
             int n = 0;
 
-            MessageBox.Show("Sending " + MCUDescription + " to port " + testPort.PortName);  // + "received " + response);
+           // this message proved useful MessageBox.Show("Sending " + MCUDescription + " to port " + testPort.PortName);  // + "received " + response);
             while ((success == false) && (n < 3))   // try each port three times
             {
                 try
@@ -233,13 +233,7 @@ namespace ASCOM.GowerCDome
 
 
             //write some code to try to connect to the ports and if that fails, the port is busy, so remove it from the list..
-            //todo remove below
-            //foreach (string port in portlist)
-           // {
-           //     MessageBox.Show("Port names are " + port);
-           // }
-
-
+          
                 foreach (string port in portlist)
             {
                 try
@@ -269,15 +263,15 @@ namespace ASCOM.GowerCDome
 
                 portlist.ToArray();
 
-//debug code below can be deleted
+/*debug code below can be deleted
             string pklist = "";   
             foreach (string port in portlist)
                 {
-                pklist += ( port + " ");
+                pklist += ( port + " ");  //concatenate the ports into a one line string
                 }
              MessageBox.Show("available Port names are " + "\n" + pklist);
 
-//end debug code
+end debug code  */
             
             //now send id messages to each port in the list to find which MCU is attached to which port.
             label1.Text= "Please wait while ID takes place";
