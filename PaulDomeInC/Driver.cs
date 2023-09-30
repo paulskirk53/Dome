@@ -412,11 +412,13 @@ namespace ASCOM.GowerCDome
         
         public void AbortSlew()
         {
-            //PK - 30-9-23 - not sure what the comment below means - bollocks by the look of it 
+            //PK - 30-9-23 - not sure what the ASCOM stub comment below means - bollocks by the look of it 
             // This is a mandatory parameter but we have no action to take in this simple driver
             tl.LogMessage("AbortSlew", "Completed");
-            // send ES to the dome and to the shutter - what happens if the shutter receives this? 
-            // How does it recover?
+            // send ES to the dome and to the shutter - when the shutter command processor receives this
+            // it causes a reset of the BT radio, the command processor mcu and the shutter mcu
+            control_Box.Transmit("ES#");    // halt dome slewing
+            pkShutter.Transmit("ES#");      // halt shutter and close it safely if open or part open
         }
 
         public double Altitude
