@@ -45,6 +45,7 @@ using ASCOM.Utilities;
 using ASCOM.DeviceInterface;
 using System.Globalization;
 using System.Collections;
+using System.Net.Mail;
 
 namespace ASCOM.GowerCDome
 {
@@ -411,8 +412,11 @@ namespace ASCOM.GowerCDome
         
         public void AbortSlew()
         {
+            //PK - 30-9-23 - not sure what the comment below means - bollocks by the look of it 
             // This is a mandatory parameter but we have no action to take in this simple driver
             tl.LogMessage("AbortSlew", "Completed");
+            // send ES to the dome and to the shutter - what happens if the shutter receives this? 
+            // How does it recover?
         }
 
         public double Altitude
