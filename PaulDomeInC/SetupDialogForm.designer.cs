@@ -240,6 +240,7 @@ namespace ASCOM.GowerCDome
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Gower Dome Setup";
+            this.Load += new System.EventHandler(this.SetupDialogForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownParkAzimuth)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownHomeAzimuth)).EndInit();

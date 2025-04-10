@@ -393,7 +393,11 @@ end debug code  */
             
         }
 
-      
+        private void SetupDialogForm_Load(object sender, EventArgs e)
+        {
+            numericUpDownParkAzimuth.Value = (decimal)Dome.ParkAzimuth;  // these two lines populate the controls with data from the ascom profile
+            numericUpDownHomeAzimuth.Value = (decimal)Dome.HomeAzimuth;
+        }
     }  // end public partial class
 
     public static class myGlobals     // this is a way of making a global variable set, accessible fom anywhere in the namespace. 

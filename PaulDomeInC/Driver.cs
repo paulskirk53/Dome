@@ -907,13 +907,16 @@ namespace ASCOM.GowerCDome
 
                 control_BoxComPort = driverProfile.GetValue(driverID,  control_BoxPortProfileName, string.Empty, control_BoxComPort);
                 ShutterComPort = driverProfile.GetValue(driverID, ShutterPortProfileName, string.Empty, ShutterComPort);
-                temp           = driverProfile.GetValue(driverID, SetParkProfilename, string.Empty, Parkplace);   //pk changed to add in string.Empty, as with the other lines here
+               
+                temp = driverProfile.GetValue(driverID, SetParkProfilename, string.Empty, Parkplace);   //pk changed to add in string.Empty, as with the other lines here
+                
                 double.TryParse(temp, out ParkAzimuth);   // this line sets the initial value of ParkAzimuth
 
 
                 temp2 = driverProfile.GetValue(driverID, SetHomeProfilename, string.Empty, Homeplace );   //pk changed to add in string.Empty, as with the other lines here
                 double.TryParse(temp2, out HomeAzimuth);
-
+            //   Console.WriteLine($"Parkplace value: {temp}");   // pk -  atest for profile empty error
+            //   Console.WriteLine($"Parkplace numeric value: {ParkAzimuth}");   // pk -  atest for profile empty error
             }
         }
 
