@@ -770,7 +770,7 @@ namespace ASCOM.GowerCDome
 
                 string SL_response = control_Box.ReceiveTerminated("#");            // read what's sent back
                 SL_response = SL_response.Replace("#", "");                       // remove the # mark
-                if (SL_response == "Moving")                                      // set this condition properly
+                if (SL_response == "Moving")                                      // set this condition properly.
                 {
                     return true;
                 }
