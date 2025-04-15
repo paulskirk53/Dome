@@ -30,3 +30,35 @@
 *.exe
 *.out
 *.app
+
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.unsuccessfulbuild
+*.vspscc
+
+# Logs
+*.log
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+build/
+
+# IDE folders
+.vs/
+GeneratedFiles/
+
+# Temporary files
+[Tt]emp/
+*.tmp
+*.obj
+*.pch
+*.bak
+*.ncb
+*.pyc
+*.class
