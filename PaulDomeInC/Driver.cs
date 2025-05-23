@@ -168,6 +168,7 @@ namespace ASCOM.GowerCDome
                 var result = F.ShowDialog();
                 if (result == System.Windows.Forms.DialogResult.OK)
                 {
+                // todo if the comports are null, disable the OK button, so cancel is the only option
                     WriteProfile(); // Persist device configuration values to the ASCOM Profile store
                 }
             }
