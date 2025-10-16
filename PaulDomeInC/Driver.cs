@@ -413,7 +413,7 @@ namespace ASCOM.GowerCDome
         
         public void AbortSlew()
         {
-            //PK - 30-9-23 - not sure what the ASCOM stub comment below means - bollocks by the look of it 
+            //PK - 30-9-23 - not sure what the ASCOM stub comment below means - nothing by the look of it 
             // This is a mandatory parameter but we have no action to take in this simple driver
             tl.LogMessage("AbortSlew", "Completed");
             // send ES to the dome and to the shutter - when the shutter command processor receives this
