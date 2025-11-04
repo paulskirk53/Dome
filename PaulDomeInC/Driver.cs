@@ -238,9 +238,23 @@ namespace ASCOM.GowerCDome
             {
  
 
-                if (value)    // Connect requested
+                if (value)    // Connect to hardware requested
                 {
-                    connectedState = Connect();    
+                    connectedState = Connect();
+
+                    //new Nov 2025
+                    // Retrieve park azimuth from profile
+
+                    var profile = new Profile();
+                    profile.DeviceType = "Dome"; // or "Telescope", "Camera", etc. depending on your driver type
+                    string parkAzimuthStr = profile.GetValue("ASCOM.GowerCDome.Dome", "ParkAzimuth", string.Empty);
+                    double parkAzimuth = Convert.ToDouble(parkAzimuthStr);
+
+                    // Send sync command to microcontroller
+                    control_Box.Transmit("STA" + parkAzimuth.ToString("0.##") + "#");
+
+                   //end new 2025
+
                 }
                 else    // Disconnect requested
                 {
