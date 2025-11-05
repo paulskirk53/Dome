@@ -251,7 +251,8 @@ namespace ASCOM.GowerCDome
                     double parkAzimuth = Convert.ToDouble(parkAzimuthStr);
 
                     // Send sync command to microcontroller
-                    control_Box.Transmit("STA" + parkAzimuth.ToString("0.##") + "#");
+                    control_Box.Transmit("STA" + Dome.Parkplace + "#");    // this should be the current value initialised in the setup dialog
+                  // control_Box.Transmit("STA" + parkAzimuth.ToString("0.##") + "#");
 
                    //end new 2025
 
