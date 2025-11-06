@@ -41,7 +41,7 @@ namespace ASCOM.GowerCDome
             Dome.Homeplace = ((int)numericUpDownHomeAzimuth.Value).ToString();
           
 
-     
+     // note these values are only persisted in the ASCOM profile. dome.parkplace and other vars do not exist after the setup dialog is closed !
 
         }
 
@@ -395,8 +395,10 @@ end debug code  */
 
         private void SetupDialogForm_Load(object sender, EventArgs e)
         {
-            numericUpDownParkAzimuth.Value = (decimal)Dome.ParkAzimuth;  // these two lines populate the controls with data from the ascom profile
-            numericUpDownHomeAzimuth.Value = (decimal)Dome.HomeAzimuth;
+            numericUpDownParkAzimuth.Value = (decimal)Dome.ParkAzimuth;  // these two lines populate the controls with data from the ascom profile - no theydon't !!!
+            numericUpDownHomeAzimuth.Value = (decimal)Dome.HomeAzimuth;  // this has nothing to do with the ASCOM Profile ! These controls are populated with whatever
+                                                                    // is in dome.pakazimuth or dome.homeazimuth when the setup dialog is insantiated - probably nothing.
+                                                                    // unless readprofile has populated them.
         }
     }  // end public partial class
 

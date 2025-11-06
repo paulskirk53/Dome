@@ -163,7 +163,7 @@ namespace ASCOM.GowerCDome
           
             System.Windows.Forms.MessageBox.Show("Already connected, just press OK");
 
-            using (SetupDialogForm F = new SetupDialogForm())
+            using (SetupDialogForm F = new SetupDialogForm())  // this line sets up an instance of the dialog form
             {
                 var result = F.ShowDialog();
                 if (result == System.Windows.Forms.DialogResult.OK)
@@ -247,12 +247,12 @@ namespace ASCOM.GowerCDome
 
                     var profile = new Profile();
                     profile.DeviceType = "Dome"; // or "Telescope", "Camera", etc. depending on your driver type
-                    string parkAzimuthStr = profile.GetValue("ASCOM.GowerCDome.Dome", "ParkAzimuth", string.Empty);
-                    double parkAzimuth = Convert.ToDouble(parkAzimuthStr);
+                    string parkAzimuthStr = profile.GetValue("ASCOM.GowerCDome.Dome", "Parkplace", string.Empty);
+                    
 
                     // Send sync command to microcontroller
-                    control_Box.Transmit("STA" + Dome.Parkplace + "#");    // this should be the current value initialised in the setup dialog
-                  // control_Box.Transmit("STA" + parkAzimuth.ToString("0.##") + "#");
+                    control_Box.Transmit("STA" + parkAzimuthStr + "#");    // this should be the current value initialised in the setup dialog
+                  
 
                    //end new 2025
 
