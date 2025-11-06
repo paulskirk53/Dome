@@ -37,8 +37,8 @@ namespace ASCOM.GowerCDome
           
             Dome.control_BoxComPort = (string)comboboxcontrol_box.SelectedItem;   //user selected port for control box MCU
             Dome.ShutterComPort = (string)comboBoxComPortShutter.SelectedItem;   //user selected port for shutter mcu
-            Dome.Parkplace = numericUpDownParkAzimuth.Value.ToString();
-            Dome.Homeplace = numericUpDownHomeAzimuth.Value.ToString();
+            Dome.Parkplace = ((int)numericUpDownParkAzimuth.Value).ToString();
+            Dome.Homeplace = ((int)numericUpDownHomeAzimuth.Value).ToString();
           
 
      
