@@ -672,7 +672,7 @@ namespace ASCOM.GowerCDome
             {
                 driverProfile.DeviceType = "Dome";
                                
-                driverProfile.WriteValue(driverID, SetParkProfilename, Parkplace.ToString());
+                driverProfile.WriteValue(driverID, SetParkProfilename, ParkAzimuth.ToString("F2"));
                 
             }
 
