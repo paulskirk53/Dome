@@ -247,7 +247,8 @@ namespace ASCOM.GowerCDome
 
                     var profile = new Profile();
                     profile.DeviceType = "Dome"; // or "Telescope", "Camera", etc. depending on your driver type
-                    string parkAzimuthStr = profile.GetValue("ASCOM.GowerCDome.Dome", "Parkplace", string.Empty);
+                    string parkAzimuthStr = profile.GetValue(driverID, SetParkProfilename, string.Empty, Parkplace);  
+                    // string parkAzimuthStr = profile.GetValue("ASCOM.GowerCDome.Dome", "Parkplace", string.Empty);
                     
 
                     // Send sync command to microcontroller
