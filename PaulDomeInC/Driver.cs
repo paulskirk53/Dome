@@ -248,8 +248,7 @@ namespace ASCOM.GowerCDome
                     var profile = new Profile();
                     profile.DeviceType = "Dome"; // or "Telescope", "Camera", etc. depending on your driver type
                     string parkAzimuthStr = profile.GetValue(driverID, SetParkProfilename, string.Empty, Parkplace);  
-                    // string parkAzimuthStr = profile.GetValue("ASCOM.GowerCDome.Dome", "Parkplace", string.Empty);
-                    
+                                        
 
                     // Send sync command to microcontroller
                     control_Box.Transmit("STA" + parkAzimuthStr + "#");    // this should be the current value initialised in the setup dialog
@@ -667,8 +666,17 @@ namespace ASCOM.GowerCDome
             
             //get the current azimuth
 
-            ParkAzimuth = Azimuth;               
- 
+            ParkAzimuth = Azimuth;
+            // wite the new park place to the ascom profile so that it persists
+            using (Profile driverProfile = new Profile())
+            {
+                driverProfile.DeviceType = "Dome";
+                               
+                driverProfile.WriteValue(driverID, SetParkProfilename, Parkplace.ToString());
+                
+            }
+
+
             tl.LogMessage("SetPark", " implemented");
            // throw new ASCOM.MethodNotImplementedException("SetPark");
         }
