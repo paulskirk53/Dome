@@ -494,7 +494,7 @@ namespace ASCOM.GowerCDome
                 int trycount = 0;
                 bool success = false;
                 double az = 0;
-
+                string response = "";
                 while (success==false)
                 {
 
@@ -503,20 +503,24 @@ namespace ASCOM.GowerCDome
                         control_Box.ClearBuffers();
                  
                         control_Box.Transmit("AZ#");
+                        control_Box.ReceiveTimeout = 4;   // 4 seconds
+                        response = control_Box.ReceiveTerminated("#");
+                        response = response.Replace("#", "");
+                        success = double.TryParse(response, out az);
 
                     }
                     catch (Exception ex)
                     {
                         tl.LogMessage("Azimuth property failure to Tx AZ#", ex.ToString());
-                        control_Box.Transmit("AZ#");
+                      //  control_Box.Transmit("AZ#");
                     }
 
-
-                    string response = control_Box.ReceiveTerminated("#");
-                    response = response.Replace("#", "");
-                    
-                    success = double.TryParse(response, out az);
-
+                    /*
+                     todo - completed 22/11/25 declare 'response' with other vars at start of get
+                     add in a control_Box.receivetimout=3 (3 is seconds)
+                     include the 3 lines below in the try block above and test
+                     */
+                   
                     trycount++;
 
                     if (trycount>4)
@@ -685,40 +689,44 @@ namespace ASCOM.GowerCDome
         {
             get
             {
-                //thoughts 
-                /*
-                 
-   - Will need to ensure the arduinos do not set the status line to open or closed before the operation is complete
-   - Also check by setting up a new ASCOM c# dome template that domeshutterstate is used - i think it's somehing i have incorporated unnecessarily.             
-   This section is get which should return ShutterStatus as ShutterState.shutterOpen or  ShutterState.shutterClosed by referencing the command processor
-   status line. A client will presumably keep calling get to check. ASCOM client sample code in device access:
-   */
-
-                tl.LogMessage("ShutterStatus Get", false.ToString());
-                pkShutter.ClearBuffers();
-                pkShutter.Transmit("SS#");                            // send the command to trigger the status response from the arduino
-
-                string state = pkShutter.ReceiveTerminated("#");
-                state = state.Replace("#", "");
-
-                switch(state)
+               
+                try
                 {
+                    pkShutter.ReceiveTimeout = 4;
 
-                    case "open":
+                    tl.LogMessage("ShutterStatus Get", false.ToString());
+                    pkShutter.ClearBuffers();
+                    pkShutter.Transmit("SS#");                            // send the command to trigger the status response from the arduino
 
-                        return ShutterState.shutterOpen;
+                    string state = pkShutter.ReceiveTerminated("#");
+                    state = state.Replace("#", "");
 
-                    case "opening":
-                        return ShutterState.shutterOpening;
+                    switch (state)
+                    {
 
-                    case "closed":
-                        return ShutterState.shutterClosed;
+                        case "open":
 
-                    case "closing":
-                        return ShutterState.shutterClosing;
-                    default:
-                        return ShutterState.shutterClosed;     // runs if there's no case match
+                            return ShutterState.shutterOpen;
+
+                        case "opening":
+                            return ShutterState.shutterOpening;
+
+                        case "closed":
+                            return ShutterState.shutterClosed;
+
+                        case "closing":
+                            return ShutterState.shutterClosing;
+                        default:
+                            return ShutterState.shutterError;     // runs if there's no case match
+
+                    }
                 }
+                catch
+                {
+                    return ShutterState.shutterError;
+                }
+
+               
 
 
             }
