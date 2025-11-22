@@ -247,12 +247,18 @@ namespace ASCOM.GowerCDome
 
                     var profile = new Profile();
                     profile.DeviceType = "Dome"; // or "Telescope", "Camera", etc. depending on your driver type
-                    string parkAzimuthStr = profile.GetValue(driverID, SetParkProfilename, string.Empty, Parkplace);  
-                                        
+                    string parkAzimuthStr = profile.GetValue(driverID, SetParkProfilename, string.Empty, Parkplace);
 
-                    // Send sync command to microcontroller
-                    control_Box.Transmit("STA" + parkAzimuthStr + "#");    // this should be the current value initialised in the setup dialog
-                  
+                    try
+                    {
+                        // Send sync command to microcontroller
+                        control_Box.Transmit("STA" + parkAzimuthStr + "#");    // this should be the current value initialised in the setup dialog
+                    }
+                    catch
+                    {
+                        control_Box.Transmit("STA" + parkAzimuthStr + "#");
+                        // do nothing else in event of failure
+                    }
 
                    //end new 2025
 
@@ -433,8 +439,17 @@ namespace ASCOM.GowerCDome
             tl.LogMessage("AbortSlew", "Completed");
             // send ES to the dome and to the shutter - when the shutter command processor receives this
             // it causes a reset of the BT radio, the command processor mcu and the shutter mcu
-            control_Box.Transmit("ES#");    // halt dome slewing
-            pkShutter.Transmit("ES#");      // halt shutter and close it safely if open or part open
+            try
+            {
+                control_Box.Transmit("ES#");    // halt dome slewing
+                pkShutter.Transmit("ES#");      // halt shutter and close it safely if open or part open
+            }
+            catch
+            {// do nothing in event of failure todo this needs better catch
+
+            }
+
+
         }
 
         public double Altitude
@@ -610,10 +625,15 @@ namespace ASCOM.GowerCDome
 
         public void CloseShutter()                                           // 13-4-17
         {
+            try
+            {
+                pkShutter.ClearBuffers();
+                pkShutter.Transmit("CS#");
+            }
+            catch
+            {// do nothing in event of failure
 
-            pkShutter.ClearBuffers();
-            pkShutter.Transmit("CS#");
-            
+            }
 
             tl.LogMessage("CloseShutter", "Shutter has been closed");
            // domeShutterState = false;
@@ -649,9 +669,15 @@ namespace ASCOM.GowerCDome
 
         public void OpenShutter()                                          // 13-4-17
         {
-            pkShutter.ClearBuffers();
-            pkShutter.Transmit("OS#");
-            
+            try
+            {
+                pkShutter.ClearBuffers();
+                pkShutter.Transmit("OS#");
+            }
+            catch
+            {
+                // do nothing in event of failure
+            }
 
             tl.LogMessage("OpenShutter", "Shutter has been opened");
           //  domeShutterState = true;
@@ -785,7 +811,7 @@ namespace ASCOM.GowerCDome
         public bool Slewing
         {
             get
-            {         
+            {         //todo 22/11/25 - need to remodel to add a control_box.receievetimout=4 and add the receiveterminated code into the try block
                 try
                 {
                     control_Box.ClearBuffers();                                         // this cured the receive problem from Arduino             
@@ -819,7 +845,14 @@ namespace ASCOM.GowerCDome
             tl.LogMessage("SyncToAzimuth", "Now implemented");
             //throw new ASCOM.MethodNotImplementedException("SyncToAzimuth");
             String AzimuthString = Azimuth.ToString("0.##");
-            control_Box.Transmit("STA" + AzimuthString +"#");
+            try
+            {
+                control_Box.Transmit("STA" + AzimuthString + "#");
+            }
+            catch
+            {
+                control_Box.Transmit("STA" + AzimuthString + "#");
+            }
         }
 
         #endregion
